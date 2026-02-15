@@ -533,6 +533,10 @@ const QuestionForm = () => {
 
       allQuestions.forEach(q => {
         const answer = answers[q.id]
+        // Skip validation for napInputs as they are handled separately
+        if (q.type === 'napInputs') {
+          return
+        }
         if (q.type === 'checkbox') {
           if (!Array.isArray(answer) || answer.length === 0) {
             missingFields.push({
@@ -543,7 +547,12 @@ const QuestionForm = () => {
           }
         } else if (q.type === 'select') {
           // Verifică dacă răspunsul este gol, undefined, null sau este opțiunea default
-          if (!answer || answer === '' || answer === 'Selectează...' || (typeof answer === 'string' && answer.trim() === '')) {
+          // Verifică și dacă răspunsul este un string valid (nu gol și nu este opțiunea default)
+          const isValidAnswer = answer && 
+                                answer !== '' && 
+                                answer !== 'Selectează...' && 
+                                (typeof answer !== 'string' || answer.trim() !== '')
+          if (!isValidAnswer) {
             missingFields.push({
               question: q.question,
               field: q.id,
