@@ -47,7 +47,13 @@ const QuestionForm = () => {
       placeholder: "ex: Somn 1: 10:00-11:30 (1.5 ore), Somn 2: 14:00-15:30 (1.5 ore)",
       conditional: true,
       dependsOn: "numberOfNaps",
-      showIf: (answers) => parseInt(answers.numberOfNaps) > 0
+      showIf: (answers) => {
+        const naps = answers.numberOfNaps
+        if (!naps) return false
+        // Gestionează atât string cât și număr
+        const napsNum = typeof naps === 'string' ? parseInt(naps.replace(/[^\d]/g, '')) : parseInt(naps)
+        return !isNaN(napsNum) && napsNum > 0
+      }
     },
     {
       id: "sleepsWith",
@@ -189,18 +195,21 @@ const QuestionForm = () => {
       }
 
       setError(null)
-      setAnswers({
+      // Actualizează answers înainte de a verifica condițiile
+      const updatedAnswers = {
         ...answers,
         [currentQ.id]: currentAnswer
-      })
-    }
+      }
+      setAnswers(updatedAnswers)
 
     // Verifică dacă următoarea întrebare este condițională
+    // Folosește updatedAnswers pentru a verifica condițiile corect
     let nextIndex = currentQuestionIndex + 1
     while (nextIndex < questions.length) {
       const nextQ = questions[nextIndex]
       if (nextQ.conditional && nextQ.showIf) {
-        if (nextQ.showIf(answers)) {
+        // Folosește updatedAnswers pentru a verifica dacă întrebarea trebuie afișată
+        if (nextQ.showIf(updatedAnswers)) {
           break
         } else {
           nextIndex++
