@@ -149,8 +149,6 @@ const QuestionForm = () => {
 
   const [currentAnswer, setCurrentAnswer] = useState('')
   const [selectedCheckboxes, setSelectedCheckboxes] = useState([])
-  const [napInputs, setNapInputs] = useState([]) // [{startTime: "10:00", duration: "90"}, ...]
-  const [wakeWindows, setWakeWindows] = useState([]) // Calculated PV-uri
 
   // Inițializează input-urile pentru somnuri când numberOfNaps se schimbă
   useEffect(() => {
@@ -310,30 +308,31 @@ const QuestionForm = () => {
       }
       setAnswers(updatedAnswers)
 
-    // Verifică dacă următoarea întrebare este condițională
-    // Folosește updatedAnswers pentru a verifica condițiile corect
-    let nextIndex = currentQuestionIndex + 1
-    while (nextIndex < questions.length) {
-      const nextQ = questions[nextIndex]
-      if (nextQ.conditional && nextQ.showIf) {
-        // Folosește updatedAnswers pentru a verifica dacă întrebarea trebuie afișată
-        if (nextQ.showIf(updatedAnswers)) {
-          break
-        } else {
-          nextIndex++
-          continue
+      // Verifică dacă următoarea întrebare este condițională
+      // Folosește updatedAnswers pentru a verifica condițiile corect
+      let nextIndex = currentQuestionIndex + 1
+      while (nextIndex < questions.length) {
+        const nextQ = questions[nextIndex]
+        if (nextQ.conditional && nextQ.showIf) {
+          // Folosește updatedAnswers pentru a verifica dacă întrebarea trebuie afișată
+          if (nextQ.showIf(updatedAnswers)) {
+            break
+          } else {
+            nextIndex++
+            continue
+          }
         }
+        break
       }
-      break
-    }
 
-    if (nextIndex < questions.length) {
-      setCurrentQuestionIndex(nextIndex)
-      setCurrentAnswer('')
-      setSelectedCheckboxes([])
-    } else {
-      // Toate întrebările au fost răspunse, trimite la backend
-      handleSubmitAll()
+      if (nextIndex < questions.length) {
+        setCurrentQuestionIndex(nextIndex)
+        setCurrentAnswer('')
+        setSelectedCheckboxes([])
+      } else {
+        // Toate întrebările au fost răspunse, trimite la backend
+        handleSubmitAll()
+      }
     }
   }
 
