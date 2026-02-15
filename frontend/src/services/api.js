@@ -38,13 +38,37 @@ export const askQuestion = async (question, answers = {}) => {
     })
 
     if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.detail || 'Eroare la întrebare')
+      let errorMessage = 'Eroare la întrebare'
+      try {
+        const errorData = await response.json()
+        // Backend-ul returnează 'error' sau 'detail'
+        errorMessage = errorData.error || errorData.detail || errorMessage
+        
+        // Adaugă informații despre status code
+        if (response.status === 503) {
+          errorMessage = `Backend indisponibil: ${errorMessage}. Verifică dacă API key-ul Gemini este configurat.`
+        } else if (response.status === 400) {
+          errorMessage = `Date invalide: ${errorMessage}`
+        } else if (response.status >= 500) {
+          errorMessage = `Eroare server: ${errorMessage}`
+        }
+      } catch (parseError) {
+        // Dacă nu se poate parsa JSON-ul, folosește status text
+        errorMessage = `Eroare ${response.status}: ${response.statusText || 'Eroare necunoscută'}`
+      }
+      throw new Error(errorMessage)
     }
 
     return await response.json()
   } catch (error) {
     console.error('Error asking question:', error)
+    
+    // Gestionează erorile de rețea
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Nu s-a putut conecta la server. Verifică dacă backend-ul rulează și dacă URL-ul este corect.')
+    }
+    
+    // Re-throw eroarea cu mesajul complet
     throw error
   }
 }

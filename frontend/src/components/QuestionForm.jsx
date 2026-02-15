@@ -326,8 +326,9 @@ const QuestionForm = () => {
       // Șterge eroarea după trimiterea cu succes
       setError(null)
     } catch (err) {
-      const errorMessage = err.response?.data?.error || err.message || 'Eroare necunoscută'
-      setError(`Eroare la trimiterea întrebării:\n\n${errorMessage}\n\nVerifică dacă backend-ul rulează și dacă API key-ul Gemini este configurat.`)
+      // Eroarea de la askQuestion deja are mesajul complet
+      const errorMessage = err.message || 'Eroare necunoscută'
+      setError(`Eroare la trimiterea întrebării:\n\n${errorMessage}`)
       console.error('Question error:', err)
     } finally {
       setLoading(false)
