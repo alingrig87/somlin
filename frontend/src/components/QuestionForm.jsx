@@ -380,7 +380,7 @@ const QuestionForm = () => {
     } else if (currentQ.type === 'napInputs') {
       // Validare pentru napInputs (somnuri de zi) - doar dacă există somnuri de zi
       if (napInputs.length > 0) {
-        const incompleteDayNaps = napInputs.some((nap, idx) => !nap.startTime || !nap.duration)
+        const incompleteDayNaps = napInputs.some((nap, idx) => !nap.startTime || !nap.duration || nap.duration === '0')
         if (incompleteDayNaps) {
           setError('Te rog completează ora de început și durata pentru toate somnurile de zi')
           return
@@ -388,7 +388,7 @@ const QuestionForm = () => {
       }
       
       // Validare pentru somnul de noapte
-      if (!nightSleep.startTime || !nightSleep.duration) {
+      if (!nightSleep.startTime || !nightSleep.duration || nightSleep.duration === '0' || parseFloat(nightSleep.duration) <= 0) {
         setError('Te rog completează ora de început și durata pentru somnul de noapte')
         return
       }
