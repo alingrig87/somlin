@@ -1,0 +1,374 @@
+{
+  "ageGroups": {
+    "0-3_months": {
+      "description": "Copii 0-3 luni",
+      "recommendedSleep": {
+        "totalHours": "14-17",
+        "nightSleep": "8-10",
+        "naps": "4-6",
+        "napDuration": "30-120 minute"
+      },
+      "situations": {
+        "sleeps_less_than_10_hours": {
+          "severity": "high",
+          "message": "Copilul doarme prea puțin pentru vârsta sa. Recomand consult medical.",
+          "recommendations": [
+            "Verifică dacă copilul primește suficientă hrană",
+            "Asigură-te că mediul este liniștit și confortabil",
+            "Consultă pediatrul pentru evaluare"
+          ]
+        },
+        "sleeps_10_14_hours": {
+          "severity": "normal",
+          "message": "Durata somnului este în limite normale pentru vârsta sa.",
+          "recommendations": [
+            "Menține un program consistent",
+            "Observă semnele de oboseală pentru a-l culca la timp"
+          ]
+        },
+        "sleeps_more_than_17_hours": {
+          "severity": "low",
+          "message": "Copilul doarme mult, dar poate fi normal pentru vârsta sa.",
+          "recommendations": [
+            "Asigură-te că se trezește pentru mese",
+            "Monitorizează creșterea și dezvoltarea"
+          ]
+        },
+        "put_to_sleep_by_parent": {
+          "severity": "normal",
+          "message": "Este normal ca părinții să culce copilul la această vârstă.",
+          "recommendations": [
+            "Folosește tehnici de calmare (șuierat, legănare)",
+            "Creează o rutină consistentă"
+          ]
+        },
+        "wakes_frequently": {
+          "severity": "normal",
+          "message": "Trezirile frecvente sunt normale la această vârstă din cauza ciclurilor de somn scurte.",
+          "recommendations": [
+            "Este normal să se trezească pentru mese",
+            "Asigură confort și siguranță"
+          ]
+        }
+      }
+    },
+    "3-6_months": {
+      "description": "Copii 3-6 luni",
+      "recommendedSleep": {
+        "totalHours": "12-15",
+        "nightSleep": "9-11",
+        "naps": "3-4",
+        "napDuration": "1-2 ore"
+      },
+      "situations": {
+        "sleeps_less_than_11_hours": {
+          "severity": "medium",
+          "message": "Durata somnului este sub recomandările pentru vârsta sa.",
+          "recommendations": [
+            "Încearcă să extinzi timpul de somn noaptea",
+            "Asigură 3-4 somnuri pe zi",
+            "Creează o rutină de culcare consistentă"
+          ]
+        },
+        "sleeps_11_15_hours": {
+          "severity": "normal",
+          "message": "Durata somnului este optimă pentru vârsta sa.",
+          "recommendations": [
+            "Menține programul actual",
+            "Observă pattern-urile de somn"
+          ]
+        },
+        "put_to_sleep_by_parent": {
+          "severity": "normal",
+          "message": "Încă este normal ca părinții să culce copilul.",
+          "recommendations": [
+            "Poți începe să înveți self-soothing",
+            "Rutina de culcare este importantă"
+          ]
+        },
+        "sleeps_alone": {
+          "severity": "normal",
+          "message": "Excelent! Copilul învață să se culce singur.",
+          "recommendations": [
+            "Menține rutina consistentă",
+            "Asigură un mediu sigur pentru somn"
+          ]
+        }
+      }
+    },
+    "6-12_months": {
+      "description": "Copii 6-12 luni",
+      "recommendedSleep": {
+        "totalHours": "12-15",
+        "nightSleep": "10-12",
+        "naps": "2-3",
+        "napDuration": "1-2 ore"
+      },
+      "situations": {
+        "sleeps_less_than_11_hours": {
+          "severity": "medium",
+          "message": "Durata somnului este sub recomandări.",
+          "recommendations": [
+            "Asigură 2-3 somnuri pe zi",
+            "Extinde timpul de somn noaptea",
+            "Verifică dacă există factori care perturbă somnul"
+          ]
+        },
+        "sleeps_11_15_hours": {
+          "severity": "normal",
+          "message": "Durata somnului este în limite normale.",
+          "recommendations": [
+            "Menține programul consistent",
+            "Observă pattern-urile de somn"
+          ]
+        },
+        "wakes_frequently": {
+          "severity": "medium",
+          "message": "Trezirile frecvente pot indica obiceiuri de somn care trebuie ajustate.",
+          "recommendations": [
+            "Încearcă să reduci dependența de ajutor la adormit",
+            "Folosește tehnici de self-soothing",
+            "Consultă somnologul dacă persistă"
+          ]
+        },
+        "refuses_to_sleep": {
+          "severity": "medium",
+          "message": "Refuzul de a se culca poate indica oboseală excesivă sau obiceiuri nepotrivite.",
+          "recommendations": [
+            "Asigură-te că copilul nu este prea obosit",
+            "Creează o rutină calmă și consistentă",
+            "Evită activități stimulante înainte de culcare"
+          ]
+        }
+      }
+    },
+    "12-18_months": {
+      "description": "Copii 12-18 luni",
+      "recommendedSleep": {
+        "totalHours": "11-14",
+        "nightSleep": "10-12",
+        "naps": "1-2",
+        "napDuration": "1-3 ore"
+      },
+      "situations": {
+        "sleeps_less_than_10_hours": {
+          "severity": "high",
+          "message": "Durata somnului este insuficientă pentru vârsta sa.",
+          "recommendations": [
+            "Asigură 1-2 somnuri pe zi",
+            "Extinde timpul de somn noaptea",
+            "Consultă somnologul pentru evaluare"
+          ]
+        },
+        "sleeps_10_14_hours": {
+          "severity": "normal",
+          "message": "Durata somnului este adecvată pentru vârsta sa.",
+          "recommendations": [
+            "Menține programul consistent",
+            "Observă pattern-urile de somn"
+          ]
+        },
+        "one_nap": {
+          "severity": "normal",
+          "message": "Un singur somn pe zi este normal la această vârstă.",
+          "recommendations": [
+            "Asigură că somnul este suficient de lung (1.5-3 ore)",
+            "Programează somnul pentru mijlocul zilei"
+          ]
+        },
+        "night_terrors": {
+          "severity": "low",
+          "message": "Terrori nocturne pot apărea la această vârstă și sunt de obicei normale.",
+          "recommendations": [
+            "Nu trezi copilul în timpul terorilor nocturne",
+            "Asigură siguranța în timpul episoadelor",
+            "Consultă doctorul dacă sunt frecvente"
+          ]
+        }
+      }
+    },
+    "18-24_months": {
+      "description": "Copii 18-24 luni",
+      "recommendedSleep": {
+        "totalHours": "11-14",
+        "nightSleep": "10-12",
+        "naps": "1",
+        "napDuration": "1.5-3 ore"
+      },
+      "situations": {
+        "sleeps_less_than_10_hours": {
+          "severity": "high",
+          "message": "Durata somnului este insuficientă.",
+          "recommendations": [
+            "Asigură un somn pe zi (1.5-3 ore)",
+            "Extinde timpul de somn noaptea",
+            "Consultă somnologul"
+          ]
+        },
+        "sleeps_10_14_hours": {
+          "severity": "normal",
+          "message": "Durata somnului este adecvată.",
+          "recommendations": [
+            "Menține programul consistent",
+            "Observă pattern-urile de somn"
+          ]
+        },
+        "no_naps": {
+          "severity": "medium",
+          "message": "Lipsa somnului poate afecta somnul nocturn.",
+          "recommendations": [
+            "Încearcă să reintroduci un somn scurt",
+            "Asigură somn suficient noaptea",
+            "Observă semnele de oboseală"
+          ]
+        },
+        "bedtime_resistance": {
+          "severity": "normal",
+          "message": "Rezistența la culcare este comună la această vârstă.",
+          "recommendations": [
+            "Menține limite clare și consistente",
+            "Folosește o rutină calmă și prevedibilă",
+            "Evită luptele de putere"
+          ]
+        }
+      }
+    },
+    "2-3_years": {
+      "description": "Copii 2-3 ani",
+      "recommendedSleep": {
+        "totalHours": "10-13",
+        "nightSleep": "10-12",
+        "naps": "0-1",
+        "napDuration": "1-2 ore"
+      },
+      "situations": {
+        "sleeps_less_than_9_hours": {
+          "severity": "high",
+          "message": "Durata somnului este insuficientă pentru vârsta sa.",
+          "recommendations": [
+            "Asigură somn suficient noaptea (minim 10 ore)",
+            "Consideră un somn scurt dacă este necesar",
+            "Consultă somnologul"
+          ]
+        },
+        "sleeps_9_13_hours": {
+          "severity": "normal",
+          "message": "Durata somnului este adecvată.",
+          "recommendations": [
+            "Menține programul consistent",
+            "Observă pattern-urile de somn"
+          ]
+        },
+        "no_naps": {
+          "severity": "normal",
+          "message": "Lipsa somnului este normală la această vârstă dacă somnul nocturn este suficient.",
+          "recommendations": [
+            "Asigură somn suficient noaptea (10-12 ore)",
+            "Observă semnele de oboseală după-amiază"
+          ]
+        },
+        "nightmares": {
+          "severity": "low",
+          "message": "Coșmarurile sunt comune la această vârstă.",
+          "recommendations": [
+            "Confortează copilul după coșmaruri",
+            "Evită conținut înfricoșător înainte de culcare",
+            "Asigură un mediu sigur și confortabil"
+          ]
+        }
+      }
+    },
+    "3-4_years": {
+      "description": "Copii 3-4 ani",
+      "recommendedSleep": {
+        "totalHours": "10-13",
+        "nightSleep": "10-12",
+        "naps": "0",
+        "napDuration": "N/A"
+      },
+      "situations": {
+        "sleeps_less_than_9_hours": {
+          "severity": "high",
+          "message": "Durata somnului este insuficientă pentru vârsta sa.",
+          "recommendations": [
+            "Asigură somn suficient noaptea (minim 10 ore)",
+            "Stabilește o oră de culcare consistentă",
+            "Consultă somnologul"
+          ]
+        },
+        "sleeps_9_13_hours": {
+          "severity": "normal",
+          "message": "Durata somnului este adecvată.",
+          "recommendations": [
+            "Menține programul consistent",
+            "Observă pattern-urile de somn"
+          ]
+        },
+        "still_napping": {
+          "severity": "normal",
+          "message": "Unii copii încă au nevoie de somn la această vârstă.",
+          "recommendations": [
+            "Asigură că somnul nu afectează somnul nocturn",
+            "Limitează somnul la 1-2 ore",
+            "Programează somnul pentru începutul după-amiezii"
+          ]
+        },
+        "sleepwalking": {
+          "severity": "low",
+          "message": "Somnambulismul poate apărea la această vârstă.",
+          "recommendations": [
+            "Asigură siguranța (uși închise, scări protejate)",
+            "Nu trezi copilul în timpul episoadelor",
+            "Consultă doctorul dacă este frecvent"
+          ]
+        }
+      }
+    }
+  },
+  "generalSituations": {
+    "sleeps_with_parents": {
+      "message": "Dormitul cu părinții poate afecta calitatea somnului pentru toți.",
+      "recommendations": [
+        "Consideră trecerea la pat propriu dacă este posibil",
+        "Dacă continuă, asigură siguranța (fără perne mari, pat mare)"
+      ]
+    },
+    "sleeps_in_own_bed": {
+      "message": "Excelent! Somnul în pat propriu promovează somnul independent.",
+      "recommendations": [
+        "Menține rutina consistentă",
+        "Asigură un mediu confortabil și sigur"
+      ]
+    },
+    "good_sleep_quality": {
+      "message": "Calitatea somnului este bună. Continuă cu programul actual.",
+      "recommendations": [
+        "Menține rutina consistentă",
+        "Observă pattern-urile de somn"
+      ]
+    },
+    "poor_sleep_quality": {
+      "message": "Calitatea somnului necesită îmbunătățiri.",
+      "recommendations": [
+        "Verifică factorii care pot afecta somnul (zgomot, lumină, temperatură)",
+        "Asigură o rutină calmă de culcare",
+        "Consultă somnologul dacă persistă"
+      ]
+    },
+    "has_sleep_routine": {
+      "message": "Rutina de culcare este importantă pentru somnul sănătos.",
+      "recommendations": [
+        "Menține rutina consistentă în fiecare seară",
+        "Include activități calme (baie, poveste, cântec)"
+      ]
+    },
+    "no_sleep_routine": {
+      "message": "O rutină de culcare consistentă poate îmbunătăți somnul.",
+      "recommendations": [
+        "Creează o rutină simplă și consistentă",
+        "Include activități calme înainte de culcare",
+        "Menține aceeași ordine în fiecare seară"
+      ]
+    }
+  }
+}

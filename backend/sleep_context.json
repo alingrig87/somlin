@@ -1,0 +1,413 @@
+{
+  "sleepGuidelines": {
+    "0-3_months": {
+      "totalSleepHours": {
+        "min": 14,
+        "max": 17,
+        "optimal": 15.5
+      },
+      "numberOfNaps": {
+        "min": 4,
+        "max": 6,
+        "optimal": 5
+      },
+      "napDuration": {
+        "min": 30,
+        "max": 120,
+        "optimal": 60
+      },
+      "nightSleep": {
+        "min": 8,
+        "max": 10,
+        "optimal": 9
+      },
+      "wakeWindows": {
+        "min": 45,
+        "max": 90,
+        "optimal": 60
+      },
+      "bedtime": {
+        "recommended": "19:00-20:00",
+        "flexible": true
+      }
+    },
+    "3-6_months": {
+      "totalSleepHours": {
+        "min": 13,
+        "max": 16,
+        "optimal": 14.5
+      },
+      "numberOfNaps": {
+        "min": 3,
+        "max": 5,
+        "optimal": 4
+      },
+      "napDuration": {
+        "min": 45,
+        "max": 120,
+        "optimal": 90
+      },
+      "nightSleep": {
+        "min": 9,
+        "max": 11,
+        "optimal": 10
+      },
+      "wakeWindows": {
+        "min": 90,
+        "max": 150,
+        "optimal": 120
+      },
+      "bedtime": {
+        "recommended": "19:00-20:00",
+        "flexible": false
+      }
+    },
+    "6-12_months": {
+      "totalSleepHours": {
+        "min": 12,
+        "max": 15,
+        "optimal": 13.5
+      },
+      "numberOfNaps": {
+        "min": 2,
+        "max": 3,
+        "optimal": 2
+      },
+      "napDuration": {
+        "min": 60,
+        "max": 120,
+        "optimal": 90
+      },
+      "nightSleep": {
+        "min": 10,
+        "max": 12,
+        "optimal": 11
+      },
+      "wakeWindows": {
+        "min": 2.5,
+        "max": 4,
+        "optimal": 3
+      },
+      "bedtime": {
+        "recommended": "19:00-20:00",
+        "flexible": false
+      }
+    },
+    "12-18_months": {
+      "totalSleepHours": {
+        "min": 11,
+        "max": 14,
+        "optimal": 12.5
+      },
+      "numberOfNaps": {
+        "min": 1,
+        "max": 2,
+        "optimal": 2
+      },
+      "napDuration": {
+        "min": 60,
+        "max": 120,
+        "optimal": 90
+      },
+      "nightSleep": {
+        "min": 10,
+        "max": 12,
+        "optimal": 11
+      },
+      "wakeWindows": {
+        "min": 4,
+        "max": 5.5,
+        "optimal": 5
+      },
+      "bedtime": {
+        "recommended": "19:00-20:00",
+        "flexible": false
+      }
+    },
+    "18-24_months": {
+      "totalSleepHours": {
+        "min": 11,
+        "max": 14,
+        "optimal": 12.5
+      },
+      "numberOfNaps": {
+        "min": 1,
+        "max": 2,
+        "optimal": 1
+      },
+      "napDuration": {
+        "min": 60,
+        "max": 180,
+        "optimal": 120
+      },
+      "nightSleep": {
+        "min": 10,
+        "max": 12,
+        "optimal": 11
+      },
+      "wakeWindows": {
+        "min": 5,
+        "max": 6,
+        "optimal": 5.5
+      },
+      "bedtime": {
+        "recommended": "19:00-20:00",
+        "flexible": false
+      }
+    },
+    "2-3_years": {
+      "totalSleepHours": {
+        "min": 10,
+        "max": 13,
+        "optimal": 11.5
+      },
+      "numberOfNaps": {
+        "min": 0,
+        "max": 1,
+        "optimal": 1
+      },
+      "napDuration": {
+        "min": 60,
+        "max": 180,
+        "optimal": 120
+      },
+      "nightSleep": {
+        "min": 10,
+        "max": 12,
+        "optimal": 11
+      },
+      "wakeWindows": {
+        "min": 5.5,
+        "max": 6.5,
+        "optimal": 6
+      },
+      "bedtime": {
+        "recommended": "19:00-20:00",
+        "flexible": false
+      }
+    },
+    "3-4_years": {
+      "totalSleepHours": {
+        "min": 10,
+        "max": 13,
+        "optimal": 11.5
+      },
+      "numberOfNaps": {
+        "min": 0,
+        "max": 1,
+        "optimal": 0
+      },
+      "napDuration": {
+        "min": 0,
+        "max": 120,
+        "optimal": 0
+      },
+      "nightSleep": {
+        "min": 10,
+        "max": 12,
+        "optimal": 11
+      },
+      "wakeWindows": {
+        "min": 6,
+        "max": 7,
+        "optimal": 6.5
+      },
+      "bedtime": {
+        "recommended": "19:00-20:30",
+        "flexible": false
+      }
+    }
+  },
+  "sleepTransitions": {
+    "4_months": {
+      "description": "Regresie somn 4 luni - tranziție majoră în ciclurile de somn",
+      "duration": "2-6 săptămâni",
+      "signs": [
+        "Treziri frecvente",
+        "Dificultate la adormit",
+        "Somn fragmentat",
+        "Necesitate de consolare constantă"
+      ],
+      "recommendations": [
+        "Menține rutina consistentă",
+        "Asigură mediu liniștit",
+        "Evită supra-oboseala",
+        "Respectă ferestrele de veghe"
+      ]
+    },
+    "8-10_months": {
+      "description": "Tranziție somnuri - reducere de la 3 la 2 somnuri",
+      "duration": "1-3 săptămâni",
+      "signs": [
+        "Refuz al celui de-al treilea somn",
+        "Somnuri mai lungi",
+        "Treziri devreme",
+        "Oboseală excesivă"
+      ],
+      "recommendations": [
+        "Extinde ferestrele de veghe",
+        "Consolidează somnurile rămase",
+        "Ajustează ora culcării"
+      ]
+    },
+    "12-18_months": {
+      "description": "Tranziție de la 2 la 1 somn",
+      "duration": "2-4 săptămâni",
+      "signs": [
+        "Refuz al celui de-al doilea somn",
+        "Somn prea scurt sau prea lung",
+        "Treziri devreme",
+        "Irritabilitate"
+      ],
+      "recommendations": [
+        "Ajustează ora somnului",
+        "Extinde fereastra de veghe de dimineață",
+        "Asigură somn suficient"
+      ]
+    },
+    "18-24_months": {
+      "description": "Tranziție de la 1 somn la fără somn (opțional)",
+      "duration": "Variabil",
+      "signs": [
+        "Refuz somn",
+        "Somn prea scurt",
+        "Treziri devreme",
+        "Somn nocturn afectat"
+      ],
+      "recommendations": [
+        "Nu forța somnul dacă nu este necesar",
+        "Asigură somn nocturn suficient",
+        "Oferă timp de odihnă chiar dacă nu doarme"
+      ]
+    },
+    "2-3_years": {
+      "description": "Tranziție finală - abandonare somn",
+      "duration": "Variabil",
+      "signs": [
+        "Refuz consistent somn",
+        "Somn nocturn suficient",
+        "Energie până seara"
+      ],
+      "recommendations": [
+        "Respectă nevoile copilului",
+        "Asigură somn nocturn de calitate",
+        "Oferă timp de odihnă liniștit"
+      ]
+    }
+  },
+  "perfectWakeWindows": {
+    "0-3_months": "45-90 minute",
+    "3-6_months": "1.5-2.5 ore",
+    "6-9_months": "2.5-3.5 ore",
+    "9-12_months": "3-4 ore",
+    "12-18_months": "4-5 ore",
+    "18-24_months": "5-6 ore",
+    "2-3_years": "5.5-6.5 ore",
+    "3-4_years": "6-7 ore"
+  },
+  "corePrinciples": {
+    "routine": {
+      "title": "Rutina trebuie să fie identică mereu",
+      "description": "Rutina de culcare trebuie să fie exact aceeași în fiecare seară, fără excepții. Aceasta ajută creierul copilului să recunoască semnalele de somn și să pregătească organismul pentru odihnă.",
+      "importance": "critical"
+    },
+    "quietPlay": {
+      "title": "Perioadă liniștită de joc",
+      "description": "Înainte de rutina de culcare, trebuie să existe o perioadă de joc liniștit, fără activități stimulante. Aceasta ajută copilul să se calmeze treptat.",
+      "duration": "30-60 minute înainte de rutină",
+      "importance": "high"
+    },
+    "lighting": {
+      "title": "Fără lumini extreme în casă",
+      "description": "Luminile din casă trebuie să fie estomate înainte de culcare. Evită lumini strălucitoare, ecrane și surse de lumină albastră care pot inhiba producția de melatonină.",
+      "importance": "high"
+    },
+    "quietReading": {
+      "title": "Citit în liniște",
+      "description": "Cititul unei povești înainte de somn este o activitate excelentă care ajută la relaxare și crește legătura părinte-copil.",
+      "importance": "high"
+    },
+    "stayInRoom": {
+      "title": "Nu se lasă să iasă din cameră după ce începe să adoarmă",
+      "description": "Odată ce rutina de culcare a început și copilul începe să adoarmă, nu trebuie lăsat să iasă din cameră. Dacă încearcă să plece, să aprindă becul, să se joace sau orice altceva, trebuie să fie pus înapoi în pat într-un mod liniștit și blând.",
+      "approach": "gentle_and_consistent",
+      "importance": "critical"
+    },
+    "temperature": {
+      "title": "Temperatură optimă pentru somn",
+      "description": "Temperatura camerei de somn trebuie să fie redusă treptat cu 0.5 grade pe săptămână, astfel încât la momentul culcării să fie cu 2 grade mai mică decât restul casei. Temperatura optimă pentru somn este între 21-22 grade Celsius.",
+      "reductionRate": "0.5 grade/săptămână",
+      "targetDifference": "2 grade mai mică decât restul casei",
+      "optimalRange": "21-22°C",
+      "importance": "high"
+    },
+    "gentleApproach": {
+      "title": "Abordare blândă și liniștită",
+      "description": "Dacă copilul vrea să plece, să aprindă becul, să se joace sau orice altceva în timpul rutinei de culcare, trebuie să fie pus înapoi în pat într-un mod liniștit, blând și consistent, fără emoții negative sau frustrări.",
+      "importance": "critical"
+    }
+  },
+  "questions": {
+    "required": [
+      {
+        "id": "age",
+        "question": "Câte luni are copilul?",
+        "type": "number",
+        "validation": {
+          "min": 0,
+          "max": 48
+        }
+      },
+      {
+        "id": "numberOfNaps",
+        "question": "Câte somnuri are copilul pe zi?",
+        "type": "number",
+        "validation": {
+          "min": 0,
+          "max": 6
+        }
+      },
+      {
+        "id": "sleepsWith",
+        "question": "Cu cine adoarme copilul? (ex: singur, cu părinții, cu bunica, etc.)",
+        "type": "text"
+      },
+      {
+        "id": "routine",
+        "question": "Care este rutina de culcare? (descrie activitățile în ordine)",
+        "type": "text"
+      },
+      {
+        "id": "routineConsistent",
+        "question": "Este rutina la fel zilnic sau variază?",
+        "type": "select",
+        "options": ["La fel zilnic", "Variază", "Parțial consistentă"]
+      },
+      {
+        "id": "wakesAtNight",
+        "question": "Se trezește copilul noaptea? Dacă da, de câte ori și cum reacționează?",
+        "type": "text"
+      },
+      {
+        "id": "goesOutside",
+        "question": "Iese copilul afară pe timpul zilei? Dacă da, cât timp?",
+        "type": "text"
+      },
+      {
+        "id": "eatingBeforeSleep",
+        "question": "Cu cât timp înainte de somn mănâncă copilul?",
+        "type": "text"
+      },
+      {
+        "id": "screenTime",
+        "question": "Se uită copilul la ecrane (TV, tabletă, telefon) înainte de culcare? Dacă da, cât timp?",
+        "type": "text"
+      },
+      {
+        "id": "loudMusic",
+        "question": "Ascultă muzică tare în casă înainte sau în timpul culcării?",
+        "type": "text"
+      }
+    ]
+  }
+}

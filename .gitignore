@@ -1,0 +1,44 @@
+# Documentation files (opțional - poți include dacă vrei)
+# ARCHITECTURE.md
+# TECH_STACK.md
+# DEMO_ROADMAP.md
+# DEPLOYMENT.md
+# VERCEL_SETUP.md
+
+# Old README
+README_OLD.md
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.local
+frontend/.env
+
+# Backend
+backend/__pycache__/
+backend/.env
+backend/venv/
+backend/env/
+backend/*.pyc
+
+# Vercel
+.vercel
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+nul
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
