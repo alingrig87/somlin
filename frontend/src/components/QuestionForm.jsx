@@ -177,6 +177,24 @@ const QuestionForm = () => {
     const calculatedPVs = []
     const ageMonths = parseInt(answers.age) || 0
 
+    // Obține PV-urile recomandate pentru vârstă (o singură dată, pentru toate calculele)
+    let recommendedPV = { min: 0, max: 0, optimal: 0 }
+    if (ageMonths <= 3) {
+      recommendedPV = { min: 45/60, max: 90/60, optimal: 60/60 }
+    } else if (ageMonths <= 6) {
+      recommendedPV = { min: 90/60, max: 150/60, optimal: 120/60 }
+    } else if (ageMonths <= 12) {
+      recommendedPV = { min: 2.5, max: 4, optimal: 3 }
+    } else if (ageMonths <= 18) {
+      recommendedPV = { min: 4, max: 5.5, optimal: 5 }
+    } else if (ageMonths <= 24) {
+      recommendedPV = { min: 5, max: 6, optimal: 5.5 }
+    } else if (ageMonths <= 36) {
+      recommendedPV = { min: 5.5, max: 6.5, optimal: 6 }
+    } else {
+      recommendedPV = { min: 6, max: 7, optimal: 6.5 }
+    }
+
     // Calculează PV între somnuri
     for (let i = 0; i < napInputs.length - 1; i++) {
       const currentNap = napInputs[i]
@@ -204,24 +222,6 @@ const QuestionForm = () => {
         }
         
         const pvHours = pvMinutes / 60
-
-        // Obține PV-urile recomandate pentru vârstă
-        let recommendedPV = { min: 0, max: 0, optimal: 0 }
-        if (ageMonths <= 3) {
-          recommendedPV = { min: 45/60, max: 90/60, optimal: 60/60 }
-        } else if (ageMonths <= 6) {
-          recommendedPV = { min: 90/60, max: 150/60, optimal: 120/60 }
-        } else if (ageMonths <= 12) {
-          recommendedPV = { min: 2.5, max: 4, optimal: 3 }
-        } else if (ageMonths <= 18) {
-          recommendedPV = { min: 4, max: 5.5, optimal: 5 }
-        } else if (ageMonths <= 24) {
-          recommendedPV = { min: 5, max: 6, optimal: 5.5 }
-        } else if (ageMonths <= 36) {
-          recommendedPV = { min: 5.5, max: 6.5, optimal: 6 }
-        } else {
-          recommendedPV = { min: 6, max: 7, optimal: 6.5 }
-        }
 
         // Verifică dacă PV-ul este ok (doar dacă este pozitiv și rezonabil)
         if (pvHours >= 0 && pvHours <= 24) {
