@@ -301,6 +301,45 @@ const QuestionForm = () => {
         handleSubmitAll()
       }
       return
+    } else if (currentQ.type === 'napInputs') {
+      // Validare pentru napInputs
+      const incomplete = napInputs.some((nap, idx) => !nap.startTime || !nap.duration)
+      if (incomplete) {
+        setError('Te rog completează ora de început și durata pentru toate somnurile')
+        return
+      }
+      
+      setError(null)
+      const updatedAnswers = {
+        ...answers,
+        [currentQ.id]: napInputs,
+        wakeWindows: wakeWindows
+      }
+      setAnswers(updatedAnswers)
+
+      // Navighează la următoarea întrebare
+      let nextIndex = currentQuestionIndex + 1
+      while (nextIndex < questions.length) {
+        const nextQ = questions[nextIndex]
+        if (nextQ.conditional && nextQ.showIf) {
+          if (nextQ.showIf(updatedAnswers)) {
+            break
+          } else {
+            nextIndex++
+            continue
+          }
+        }
+        break
+      }
+
+      if (nextIndex < questions.length) {
+        setCurrentQuestionIndex(nextIndex)
+        setCurrentAnswer('')
+        setSelectedCheckboxes([])
+      } else {
+        handleSubmitAll()
+      }
+      return
     } else {
       // Validare pentru select
       if (currentQ.type === 'select') {
