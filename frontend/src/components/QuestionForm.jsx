@@ -307,8 +307,39 @@ const QuestionForm = () => {
       const problemsText = Array.isArray(answers.problems) ? answers.problems.join(', ') : 'Nu a fost specificat'
       const napDetailsText = answers.napDetails || 'Nu a fost specificat'
       const routineText = answers.routine || 'Nu a fost specificat'
-      const ageText = answers.age || 'Nu a fost specificat'
-      const napsText = answers.numberOfNaps || 'Nu a fost specificat'
+      
+      // Extrage numărul din răspunsul pentru vârstă (ex: "19 luni" -> "19")
+      let ageText = 'Nu a fost specificat'
+      let ageNumber = null
+      if (answers.age) {
+        const ageMatch = answers.age.toString().match(/\d+/)
+        if (ageMatch) {
+          ageNumber = parseInt(ageMatch[0])
+          ageText = ageNumber.toString()
+        } else {
+          ageText = answers.age
+        }
+      }
+      
+      // Extrage numărul din răspunsul pentru număr somnuri
+      let napsText = 'Nu a fost specificat'
+      let napsNumber = null
+      if (answers.numberOfNaps) {
+        const napsMatch = answers.numberOfNaps.toString().match(/\d+/)
+        if (napsMatch) {
+          napsNumber = parseInt(napsMatch[0])
+          napsText = napsNumber.toString()
+        } else {
+          napsText = answers.numberOfNaps
+        }
+      }
+      
+      // Trimite doar numerele în answers pentru backend
+      const cleanedAnswers = {
+        ...answers,
+        age: ageNumber !== null ? ageNumber : answers.age,
+        numberOfNaps: napsNumber !== null ? napsNumber : answers.numberOfNaps
+      }
       const sleepsWithText = answers.sleepsWith || 'Nu a fost specificat'
       const routineConsistentText = answers.routineConsistent || 'Nu a fost specificat'
       const wakesAtNightText = answers.wakesAtNight || 'Nu se trezește noaptea'
@@ -319,7 +350,7 @@ const QuestionForm = () => {
       
       const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${ageText} luni. Are ${napsText} somnuri pe zi. Detalii somnuri de zi: ${napDetailsText}. Adoarme ${sleepsWithText}. Rutina de culcare: ${routineText}. Rutina este ${routineConsistentText}. Se trezește noaptea: ${wakesAtNightText}. Iese afară: ${goesOutsideText}. Mănâncă cu ${eatingBeforeSleepText} înainte de somn. Ecrane: ${screenTimeText}. Muzică: ${loudMusicText}. Ce recomandări ai pentru îmbunătățirea somnului?`
       
-      const response = await askQuestion(fullQuestion, answers)
+      const response = await askQuestion(fullQuestion, cleanedAnswers)
       setAnswer(response.answer)
       setPriorities(response.priorities || [])
       setShowFinalAnswer(true)

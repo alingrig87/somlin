@@ -127,7 +127,15 @@ def get_priorities_for_issues(issues):
 
 def build_gemini_prompt(question: str, answers: dict) -> str:
     """Construiește prompt-ul complet pentru Gemini - optimizat cu informații statice"""
-    age_months = int(answers.get('age', 0) or 0)
+    # Extrage numărul din răspunsul pentru vârstă (poate fi "19 luni" sau doar "19")
+    age_value = answers.get('age', 0) or 0
+    if isinstance(age_value, str):
+        # Extrage primul număr din string
+        import re
+        age_match = re.search(r'\d+', str(age_value))
+        age_months = int(age_match.group(0)) if age_match else 0
+    else:
+        age_months = int(age_value)
     age_group = get_age_group_from_months(age_months)
     
     # Folosește informații statice pentru vârstă (reduce costurile Gemini)
