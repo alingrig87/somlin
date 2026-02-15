@@ -31,16 +31,14 @@ const QuestionForm = () => {
     {
       id: "age",
       question: "Câte luni are copilul?",
-      type: "number",
-      placeholder: "ex: 18",
-      validation: { min: 0, max: 48 }
+      type: "select",
+      options: Array.from({ length: 49 }, (_, i) => `${i} luni`)
     },
     {
       id: "numberOfNaps",
       question: "Câte somnuri are copilul pe zi?",
-      type: "number",
-      placeholder: "ex: 2",
-      validation: { min: 0, max: 6 }
+      type: "select",
+      options: ["0", "1", "2", "3", "4", "5", "6"]
     },
     {
       id: "napDetails",
@@ -54,8 +52,15 @@ const QuestionForm = () => {
     {
       id: "sleepsWith",
       question: "Cu cine adoarme copilul?",
-      type: "text",
-      placeholder: "ex: singur, cu părinții, cu bunica, etc."
+      type: "select",
+      options: [
+        "Singur în patul lui",
+        "Cu părinții în patul părinților",
+        "Cu părinții în patul copilului",
+        "Cu bunica/bunicul",
+        "Cu frații",
+        "Altele"
+      ]
     },
     {
       id: "routine",
@@ -78,26 +83,53 @@ const QuestionForm = () => {
     {
       id: "goesOutside",
       question: "Iese copilul afară pe timpul zilei? Dacă da, cât timp?",
-      type: "text",
-      placeholder: "ex: da, 1-2 ore pe zi"
+      type: "select",
+      options: [
+        "Nu iese afară",
+        "Da, mai puțin de 30 minute",
+        "Da, 30 minute - 1 oră",
+        "Da, 1-2 ore",
+        "Da, 2-3 ore",
+        "Da, peste 3 ore"
+      ]
     },
     {
       id: "eatingBeforeSleep",
       question: "Cu cât timp înainte de somn mănâncă copilul?",
-      type: "text",
-      placeholder: "ex: 30 minute, 1 oră, etc."
+      type: "select",
+      options: [
+        "Nu mănâncă înainte de somn",
+        "15 minute înainte",
+        "30 minute înainte",
+        "45 minute înainte",
+        "1 oră înainte",
+        "1.5 ore înainte",
+        "2 ore înainte",
+        "Peste 2 ore înainte"
+      ]
     },
     {
       id: "screenTime",
       question: "Se uită copilul la ecrane (TV, tabletă, telefon) înainte de culcare? Dacă da, cât timp?",
-      type: "text",
-      placeholder: "ex: da, 30 minute sau nu"
+      type: "select",
+      options: [
+        "Nu se uită la ecrane",
+        "Da, mai puțin de 15 minute",
+        "Da, 15-30 minute",
+        "Da, 30-60 minute",
+        "Da, peste 1 oră"
+      ]
     },
     {
       id: "loudMusic",
       question: "Ascultă muzică tare în casă înainte sau în timpul culcării?",
-      type: "text",
-      placeholder: "ex: da, muzică tare sau nu"
+      type: "select",
+      options: [
+        "Nu",
+        "Da, ocazional",
+        "Da, frecvent",
+        "Da, zilnic"
+      ]
     }
   ]
 
@@ -133,12 +165,21 @@ const QuestionForm = () => {
         [currentQ.id]: selectedCheckboxes
       })
     } else {
-      if (!currentAnswer.trim()) {
-        setError('Te rog completează răspunsul')
-        return
+      // Validare pentru select
+      if (currentQ.type === 'select') {
+        if (!currentAnswer || currentAnswer === '') {
+          setError('Te rog selectează o opțiune')
+          return
+        }
+      } else {
+        // Validare pentru textarea și text
+        if (!currentAnswer.trim()) {
+          setError('Te rog completează răspunsul')
+          return
+        }
       }
 
-      // Validare pentru număr
+      // Validare pentru număr (dacă mai există)
       if (currentQ.type === 'number') {
         const num = parseInt(currentAnswer)
         if (isNaN(num) || num < currentQ.validation.min || num > currentQ.validation.max) {
