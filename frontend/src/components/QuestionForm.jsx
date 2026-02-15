@@ -268,11 +268,12 @@ const QuestionForm = () => {
   const currentQuestionNumber = currentQuestionIndex + 1
   const progress = (currentQuestionNumber / totalQuestions) * 100
 
-  // Restaurează răspunsul dacă există
+  // Restaurează răspunsul dacă există (doar când se schimbă întrebarea)
   useEffect(() => {
     if (currentQuestion) {
       if (currentQuestion.type === 'checkbox') {
-        setSelectedCheckboxes(Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id] : [])
+        const savedAnswer = Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id] : []
+        setSelectedCheckboxes(savedAnswer)
         setCurrentAnswer('')
       } else {
         setCurrentAnswer(answers[currentQuestion.id] || '')
@@ -282,7 +283,8 @@ const QuestionForm = () => {
       setCurrentAnswer('')
       setSelectedCheckboxes([])
     }
-  }, [currentQuestionIndex, currentQuestion])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestionIndex])
 
   if (showFinalAnswer) {
     return (
