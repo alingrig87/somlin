@@ -1,0 +1,261 @@
+{
+  "priorities": {
+    "urgent": [
+      {
+        "id": "routine_consistency",
+        "title": "Stabilirea unei rutine identice zilnic",
+        "description": "Rutina trebuie să fie exact aceeași în fiecare seară",
+        "duration": "2-3 săptămâni",
+        "gradual": true,
+        "gradualDescription": "Începe cu 3-4 elemente de bază, adaugă progresiv restul",
+        "icon": "calendar"
+      },
+      {
+        "id": "sleep_association",
+        "title": "Eliminarea asocierilor de somn dependente",
+        "description": "Reducerea treptată a asocierilor care necesită intervenție constantă",
+        "duration": "3-4 săptămâni",
+        "gradual": true,
+        "gradualDescription": "Reducere progresivă cu 5-10 minute pe săptămână",
+        "icon": "bed"
+      },
+      {
+        "id": "wake_windows",
+        "title": "Ajustarea ferestrelor de veghe (PV)",
+        "description": "Respectarea intervalelor de veghe potrivite pentru vârstă",
+        "duration": "1-2 săptămâni",
+        "gradual": false,
+        "icon": "clock"
+      },
+      {
+        "id": "bedtime_consistency",
+        "title": "Ora de culcare consistentă",
+        "description": "Aceeași oră de culcare în fiecare seară, cu variație maximă de 15 minute",
+        "duration": "1 săptămână",
+        "gradual": false,
+        "icon": "moon"
+      }
+    ],
+    "important": [
+      {
+        "id": "screen_time",
+        "title": "Eliminarea ecranelor înainte de somn",
+        "description": "Nu ecrane cu 1-2 ore înainte de culcare",
+        "duration": "1 săptămână",
+        "gradual": true,
+        "gradualDescription": "Reducere progresivă cu 15 minute pe zi",
+        "icon": "tv"
+      },
+      {
+        "id": "room_temperature",
+        "title": "Optimizarea temperaturii camerei",
+        "description": "Temperatură 21-22°C, redusă treptat cu 0.5 grade/săptămână",
+        "duration": "4-6 săptămâni",
+        "gradual": true,
+        "gradualDescription": "Reducere cu 0.5 grade pe săptămână până la 2 grade sub restul casei",
+        "icon": "thermometer"
+      },
+      {
+        "id": "quiet_play",
+        "title": "Perioadă liniștită de joc înainte de rutină",
+        "description": "30-60 minute de activități calme înainte de rutina de culcare",
+        "duration": "1 săptămână",
+        "gradual": false,
+        "icon": "toy"
+      },
+      {
+        "id": "lighting",
+        "title": "Reducerea luminilor extreme",
+        "description": "Estomparea luminilor cu 1-2 ore înainte de culcare",
+        "duration": "3-5 zile",
+        "gradual": false,
+        "icon": "lightbulb"
+      }
+    ],
+    "moderate": [
+      {
+        "id": "nap_timing",
+        "title": "Optimizarea orelor somnurilor de zi",
+        "description": "Ajustarea orelor somnurilor pentru a nu afecta somnul nocturn",
+        "duration": "1-2 săptămâni",
+        "gradual": true,
+        "gradualDescription": "Ajustare cu 15-30 minute pe zi",
+        "icon": "sun"
+      },
+      {
+        "id": "feeding_timing",
+        "title": "Ajustarea orei mesei înainte de somn",
+        "description": "Mâncarea cu minim 1 oră înainte de culcare",
+        "duration": "3-5 zile",
+        "gradual": true,
+        "gradualDescription": "Mutare progresivă cu 15 minute pe zi",
+        "icon": "utensils"
+      },
+      {
+        "id": "outdoor_time",
+        "title": "Timp suficient în aer liber",
+        "description": "Minim 1-2 ore pe zi în aer liber pentru expunere la lumină naturală",
+        "duration": "Ongoing",
+        "gradual": false,
+        "icon": "tree"
+      }
+    ]
+  },
+  "ageBasedSleepNeeds": {
+    "0-3_months": {
+      "totalHours": { "min": 14, "max": 17, "optimal": 15.5 },
+      "naps": { "min": 4, "max": 6, "optimal": 5 },
+      "nightSleep": { "min": 8, "max": 10, "optimal": 9 },
+      "wakeWindows": "45-90 minute",
+      "bedtime": "19:00-20:00"
+    },
+    "3-6_months": {
+      "totalHours": { "min": 13, "max": 16, "optimal": 14.5 },
+      "naps": { "min": 3, "max": 5, "optimal": 4 },
+      "nightSleep": { "min": 9, "max": 11, "optimal": 10 },
+      "wakeWindows": "1.5-2.5 ore",
+      "bedtime": "19:00-20:00"
+    },
+    "6-12_months": {
+      "totalHours": { "min": 12, "max": 15, "optimal": 13.5 },
+      "naps": { "min": 2, "max": 3, "optimal": 2 },
+      "nightSleep": { "min": 10, "max": 12, "optimal": 11 },
+      "wakeWindows": "2.5-4 ore",
+      "bedtime": "19:00-20:00"
+    },
+    "12-18_months": {
+      "totalHours": { "min": 11, "max": 14, "optimal": 12.5 },
+      "naps": { "min": 1, "max": 2, "optimal": 2 },
+      "nightSleep": { "min": 10, "max": 12, "optimal": 11 },
+      "wakeWindows": "4-5 ore",
+      "bedtime": "19:00-20:00"
+    },
+    "18-24_months": {
+      "totalHours": { "min": 11, "max": 14, "optimal": 12.5 },
+      "naps": { "min": 1, "max": 2, "optimal": 1 },
+      "nightSleep": { "min": 10, "max": 12, "optimal": 11 },
+      "wakeWindows": "5-6 ore",
+      "bedtime": "19:00-20:00"
+    },
+    "2-3_years": {
+      "totalHours": { "min": 10, "max": 13, "optimal": 11.5 },
+      "naps": { "min": 0, "max": 1, "optimal": 1 },
+      "nightSleep": { "min": 10, "max": 12, "optimal": 11 },
+      "wakeWindows": "5.5-6.5 ore",
+      "bedtime": "19:00-20:00"
+    },
+    "3-4_years": {
+      "totalHours": { "min": 10, "max": 13, "optimal": 11.5 },
+      "naps": { "min": 0, "max": 1, "optimal": 0 },
+      "nightSleep": { "min": 10, "max": 12, "optimal": 11 },
+      "wakeWindows": "6-7 ore",
+      "bedtime": "19:00-20:30"
+    }
+  },
+  "commonIssues": {
+    "inconsistent_routine": {
+      "problem": "Rutina variază zilnic",
+      "impact": "high",
+      "solution": "Stabilirea unei rutine identice zilnic",
+      "priority": "urgent"
+    },
+    "sleep_association": {
+      "problem": "Asociere de somn dependentă (legănat, lapte, etc.)",
+      "impact": "high",
+      "solution": "Reducere treptată a asocierii",
+      "priority": "urgent"
+    },
+    "screen_before_bed": {
+      "problem": "Ecrane înainte de culcare",
+      "impact": "medium",
+      "solution": "Eliminarea ecranelor cu 1-2 ore înainte",
+      "priority": "important"
+    },
+    "late_bedtime": {
+      "problem": "Ora de culcare prea târzie",
+      "impact": "high",
+      "solution": "Ajustarea orei de culcare pentru vârstă",
+      "priority": "urgent"
+    },
+    "wrong_wake_windows": {
+      "problem": "Ferestre de veghe nepotrivite",
+      "impact": "high",
+      "solution": "Ajustarea PV-urilor pentru vârstă",
+      "priority": "urgent"
+    },
+    "too_many_naps": {
+      "problem": "Prea multe somnuri pentru vârstă",
+      "impact": "medium",
+      "solution": "Reducerea numărului de somnuri",
+      "priority": "important"
+    },
+    "too_few_naps": {
+      "problem": "Prea puține somnuri pentru vârstă",
+      "impact": "medium",
+      "solution": "Adăugarea unui somn suplimentar",
+      "priority": "important"
+    },
+    "extreme_lights": {
+      "problem": "Lumini strălucitoare înainte de somn",
+      "impact": "medium",
+      "solution": "Estomparea luminilor",
+      "priority": "important"
+    },
+    "room_too_warm": {
+      "problem": "Temperatură cameră prea ridicată",
+      "impact": "medium",
+      "solution": "Reducerea temperaturii la 21-22°C",
+      "priority": "important"
+    },
+    "feeding_too_late": {
+      "problem": "Mâncare prea aproape de somn",
+      "impact": "low",
+      "solution": "Mâncare cu minim 1 oră înainte",
+      "priority": "moderate"
+    }
+  },
+  "synonyms": {
+    "greetings": [
+      "Bună!",
+      "Buna!",
+      "Salut!",
+      "Bună ziua!",
+      "Bună seara!"
+    ],
+    "introductions": [
+      "Analizând situația copilului tău",
+      "După ce am analizat informațiile",
+      "Bazându-mă pe datele furnizate",
+      "Analizând datele despre somnul copilului",
+      "În urma analizei situației"
+    ],
+    "positive_feedback": [
+      "Este bine că",
+      "Pozitiv este că",
+      "Un aspect bun este",
+      "Bine făcut că",
+      "Corect este că"
+    ],
+    "negative_feedback": [
+      "Problema este că",
+      "Aspectul care necesită atenție este",
+      "Ce trebuie îmbunătățit este",
+      "Un punct de îmbunătățire este",
+      "Atenție la"
+    ],
+    "recommendations_start": [
+      "Recomandarea mea este",
+      "Sugerez să",
+      "Este important să",
+      "Ar trebui să",
+      "Te sfătuiesc să"
+    ],
+    "conclusions": [
+      "Cu răbdare și consistență",
+      "Cu timp și răbdare",
+      "Pas cu pas",
+      "Treptat și constant",
+      "Cu perseverență"
+    ]
+  }
+}

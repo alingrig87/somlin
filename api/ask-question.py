@@ -2,11 +2,27 @@ from http.server import BaseHTTPRequestHandler
 import json
 import os
 import requests
+import random
 from urllib.parse import parse_qs, urlparse
 
 # Gemini API configuration
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+
+# Încarcă datele statice
+def load_static_data():
+    """Încarcă datele statice din JSON"""
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # Încearcă mai întâi în același folder (pentru Vercel)
+    json_path = os.path.join(current_dir, 'sleep_priorities.json')
+    if not os.path.exists(json_path):
+        # Dacă nu există, încearcă în backend (pentru local)
+        json_path = os.path.join(current_dir, '..', 'backend', 'sleep_priorities.json')
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
 
 def get_age_group_from_months(months: int) -> str:
     """Determină grupa de vârstă din luni"""
@@ -25,93 +41,110 @@ def get_age_group_from_months(months: int) -> str:
     else:
         return "3-4_years"
 
-def load_sleep_context():
-    """Încarcă contextul despre somn din fișierul JSON"""
-    import json as json_module
-    # Contextul va fi încorporat în cod sau încărcat din fișier
-    # Pentru simplitate, vom include doar principiile fundamentale
-    return {
-        "corePrinciples": {
-            "routine": "Rutina trebuie să fie identică mereu",
-            "quietPlay": "Perioadă liniștită de joc (30-60 minute)",
-            "lighting": "Fără lumini extreme în casă",
-            "quietReading": "Citit în liniște",
-            "stayInRoom": "Nu se lasă să iasă din cameră după ce începe să adoarmă",
-            "temperature": "Temperatură 21-22°C, redusă cu 0.5 grade/săptămână",
-            "gentleApproach": "Abordare blândă și liniștită"
-        }
+STATIC_DATA = load_static_data()
+
+def get_synonym(category):
+    """Obține un sinonim aleatoriu dintr-o categorie"""
+    if STATIC_DATA.get('synonyms') and STATIC_DATA['synonyms'].get(category):
+        return random.choice(STATIC_DATA['synonyms'][category])
+    return ""
+
+def detect_issues(answers):
+    """Detectează problemele din răspunsuri"""
+    issues = []
+    problems = answers.get('problems', [])
+    
+    if isinstance(problems, list):
+        for problem in problems:
+            problem_lower = problem.lower()
+            if 'rutin' in problem_lower or 'consistent' in problem_lower:
+                issues.append('inconsistent_routine')
+            if 'adoarme' in problem_lower and ('greu' in problem_lower or 'dificultate' in problem_lower):
+                issues.append('sleep_association')
+            if 'ecran' in problem_lower or 'tv' in problem_lower or 'tablet' in problem_lower or 'telefon' in problem_lower:
+                issues.append('screen_before_bed')
+            if ('trezeste' in problem_lower and 'des' in problem_lower) or 'treziri' in problem_lower:
+                issues.append('wrong_wake_windows')
+            if 'suficient' in problem_lower and 'nu' in problem_lower:
+                issues.append('wrong_wake_windows')
+            if 'devreme' in problem_lower:
+                issues.append('wrong_wake_windows')
+    
+    routine_consistent = answers.get('routineConsistent', '').lower()
+    if 'varia' in routine_consistent or 'parțial' in routine_consistent:
+        issues.append('inconsistent_routine')
+    
+    screen_time = answers.get('screenTime', '').lower()
+    if screen_time and ('da' in screen_time or 'yes' in screen_time or 'minute' in screen_time or 'ore' in screen_time):
+        issues.append('screen_before_bed')
+    
+    sleeps_with = answers.get('sleepsWith', '').lower()
+    if sleeps_with and ('bunica' in sleeps_with or 'legănat' in sleeps_with or 'lapte' in sleeps_with or 'brațe' in sleeps_with):
+        issues.append('sleep_association')
+    
+    return list(set(issues))  # Elimină duplicatele
+
+def get_priorities_for_issues(issues):
+    """Obține prioritățile pentru problemele detectate"""
+    if not STATIC_DATA.get('priorities'):
+        return []
+    
+    priorities_list = []
+    issues_data = STATIC_DATA.get('commonIssues', {})
+    added_priority_ids = set()
+    
+    # Mapare directă issue -> priority
+    issue_to_priority = {
+        'inconsistent_routine': 'routine_consistency',
+        'sleep_association': 'sleep_association',
+        'screen_before_bed': 'screen_time',
+        'wrong_wake_windows': 'wake_windows',
+        'late_bedtime': 'bedtime_consistency'
     }
+    
+    for issue_id in issues:
+        priority_id = issue_to_priority.get(issue_id)
+        if priority_id and priority_id not in added_priority_ids:
+            # Caută prioritatea în toate nivelurile
+            for level in ['urgent', 'important', 'moderate']:
+                if level in STATIC_DATA['priorities']:
+                    for priority in STATIC_DATA['priorities'][level]:
+                        if priority['id'] == priority_id:
+                            priorities_list.append({
+                                **priority,
+                                'level': level
+                            })
+                            added_priority_ids.add(priority_id)
+                            break
+                    if priority_id in added_priority_ids:
+                        break
+    
+    # Sortează după nivel (urgent, important, moderate)
+    level_order = {'urgent': 0, 'important': 1, 'moderate': 2}
+    priorities_list.sort(key=lambda x: level_order.get(x.get('level', 'moderate'), 2))
+    
+    return priorities_list
 
 def build_gemini_prompt(question: str, answers: dict) -> str:
-    """Construiește prompt-ul complet pentru Gemini"""
+    """Construiește prompt-ul complet pentru Gemini - optimizat cu informații statice"""
     age_months = int(answers.get('age', 0) or 0)
+    age_group = get_age_group_from_months(age_months)
     
-    # Informații despre vârstă pentru recomandări
-    age_info = ""
-    if age_months > 0:
-        if age_months <= 3:
-            age_info = f"""
-INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 0-3 luni):
-- Somn total recomandat: 14-17 ore (optim: 15.5 ore)
-- Număr de somnuri recomandat: 4-6 somnuri (optim: 5)
-- Durată somn nocturn: 8-10 ore (optim: 9 ore)
-- Ferestre de veghe (PV): 45-90 minute
-- Ora culcării recomandată: 19:00-20:00
+    # Folosește informații statice pentru vârstă (reduce costurile Gemini)
+    age_data = STATIC_DATA.get('ageBasedSleepNeeds', {}).get(age_group, {})
+    if age_data:
+        age_info = f"""
+INFORMAȚII STATICE DESPRE VÂRSTA COPILULUI ({age_months} luni - {age_group.replace('_', ' ')}):
+- Somn total recomandat: {age_data['totalHours']['min']}-{age_data['totalHours']['max']} ore (optim: {age_data['totalHours']['optimal']} ore)
+- Număr de somnuri recomandat: {age_data['naps']['min']}-{age_data['naps']['max']} somnuri (optim: {age_data['naps']['optimal']})
+- Durată somn nocturn: {age_data['nightSleep']['min']}-{age_data['nightSleep']['max']} ore (optim: {age_data['nightSleep']['optimal']} ore)
+- Ferestre de veghe (PV): {age_data['wakeWindows']}
+- Ora culcării recomandată: {age_data['bedtime']}
+
+NOTĂ: Aceste valori sunt standarde bazate pe cercetări științifice pentru această vârstă. Folosește-le ca referință în analiză.
 """
-        elif age_months <= 6:
-            age_info = f"""
-INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 3-6 luni):
-- Somn total recomandat: 13-16 ore (optim: 14.5 ore)
-- Număr de somnuri recomandat: 3-5 somnuri (optim: 4)
-- Durată somn nocturn: 9-11 ore (optim: 10 ore)
-- Ferestre de veghe (PV): 1.5-2.5 ore
-- Ora culcării recomandată: 19:00-20:00
-"""
-        elif age_months <= 12:
-            age_info = f"""
-INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 6-12 luni):
-- Somn total recomandat: 12-15 ore (optim: 13.5 ore)
-- Număr de somnuri recomandat: 2-3 somnuri (optim: 2)
-- Durată somn nocturn: 10-12 ore (optim: 11 ore)
-- Ferestre de veghe (PV): 2.5-4 ore
-- Ora culcării recomandată: 19:00-20:00
-"""
-        elif age_months <= 18:
-            age_info = f"""
-INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 12-18 luni):
-- Somn total recomandat: 11-14 ore (optim: 12.5 ore)
-- Număr de somnuri recomandat: 1-2 somnuri (optim: 2)
-- Durată somn nocturn: 10-12 ore (optim: 11 ore)
-- Ferestre de veghe (PV): 4-5 ore
-- Ora culcării recomandată: 19:00-20:00
-"""
-        elif age_months <= 24:
-            age_info = f"""
-INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 18-24 luni):
-- Somn total recomandat: 11-14 ore (optim: 12.5 ore)
-- Număr de somnuri recomandat: 1-2 somnuri (optim: 1)
-- Durată somn nocturn: 10-12 ore (optim: 11 ore)
-- Ferestre de veghe (PV): 5-6 ore
-- Ora culcării recomandată: 19:00-20:00
-"""
-        elif age_months <= 36:
-            age_info = f"""
-INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 2-3 ani):
-- Somn total recomandat: 10-13 ore (optim: 11.5 ore)
-- Număr de somnuri recomandat: 0-1 somn (optim: 1)
-- Durată somn nocturn: 10-12 ore (optim: 11 ore)
-- Ferestre de veghe (PV): 5.5-6.5 ore
-- Ora culcării recomandată: 19:00-20:00
-"""
-        else:
-            age_info = f"""
-INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 3-4 ani):
-- Somn total recomandat: 10-13 ore (optim: 11.5 ore)
-- Număr de somnuri recomandat: 0-1 somn (optim: 0)
-- Durată somn nocturn: 10-12 ore (optim: 11 ore)
-- Ferestre de veghe (PV): 6-7 ore
-- Ora culcării recomandată: 19:00-20:30
-"""
+    else:
+        age_info = ""
     
     context = f"""
 PRINCIPII FUNDAMENTALE PENTRU SOMN OPTIMAL (APLICĂ ÎNTOTDEAUNA):
@@ -145,9 +178,19 @@ PRINCIPII FUNDAMENTALE PENTRU SOMN OPTIMAL (APLICĂ ÎNTOTDEAUNA):
    - Fără emoții negative sau frustrări
 """
     
-    prompt = f"""Ești Ruxandra Trufașu, somnolog expert specializat în somnul copiilor (0-4 ani), cu experiență vastă în consilierea părinților.
+    # Detectează problemele (pentru a reduce prompt-ul și a oferi context)
+    detected_issues = detect_issues(answers)
+    issues_summary = ", ".join(detected_issues) if detected_issues else "Nu s-au detectat probleme specifice"
+    
+    # Folosește sinonime pentru varietate
+    greeting = get_synonym('greetings') or "Bună!"
+    introduction = get_synonym('introductions') or "Analizând situația copilului tău"
+    
+    prompt = f"""{greeting} {introduction}, ești Ruxandra Trufașu, somnolog expert specializat în somnul copiilor (0-4 ani).
 
 {age_info}
+
+PROBLEME DETECTATE (folosește aceste informații în analiză): {issues_summary}
 
 {context}
 
@@ -201,8 +244,11 @@ IMPORTANT:
 - Folosește termeni specifici somnului copiilor: PV (perioadă de veghe), SN (somn de noapte), ferestre de veghe, supra-oboseală, regresii, tranziții
 - Nu fi prea formal - tonul e prietenos dar profesional
 - Asigură-te că toate principiile fundamentale sunt menționate și explicate
+- Folosește informațiile statice despre vârstă pentru recomandări precise
+- Variind formulările folosind sinonime pentru a nu fi repetitiv
+- La final, menționează că urmează un plan de acțiune cu priorități
 
-Răspunsul tău:"""
+Răspunsul tău (fără planul de acțiune - acesta va fi adăugat automat):"""
     
     return prompt
 
@@ -280,12 +326,30 @@ class handler(BaseHTTPRequestHandler):
             else:
                 raise Exception("Nu s-a primit răspuns de la Gemini")
             
-            # Returnează răspunsul
+            # Detectează probleme și generează priorități
+            issues = detect_issues(answers)
+            priorities = get_priorities_for_issues(issues)
+            
+            # Dacă nu s-au găsit priorități specifice, adaugă priorități generale bazate pe probleme
+            if not priorities:
+                problems_list = answers.get('problems', [])
+                if isinstance(problems_list, list) and len(problems_list) > 0:
+                    # Adaugă priorități generale
+                    if STATIC_DATA.get('priorities'):
+                        # Adaugă primele 2-3 priorități urgente
+                        urgent = STATIC_DATA['priorities'].get('urgent', [])[:2]
+                        for p in urgent:
+                            priorities.append({**p, 'level': 'urgent'})
+            
+            # Returnează răspunsul cu priorități
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            self.wfile.write(json.dumps({'answer': answer}).encode())
+            self.wfile.write(json.dumps({
+                'answer': answer,
+                'priorities': priorities
+            }).encode())
             
         except Exception as e:
             self.send_response(500)

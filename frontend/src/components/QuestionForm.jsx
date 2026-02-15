@@ -221,6 +221,7 @@ const QuestionForm = () => {
       
       const response = await askQuestion(fullQuestion, answers)
       setAnswer(response.answer)
+      setPriorities(response.priorities || [])
       setShowFinalAnswer(true)
     } catch (err) {
       setError(err.message || 'Eroare la trimiterea întrebării. Verifică dacă backend-ul rulează și dacă API key-ul Gemini este configurat.')
@@ -235,6 +236,7 @@ const QuestionForm = () => {
     setAnswers({})
     setCurrentAnswer('')
     setAnswer('')
+    setPriorities([])
     setShowFinalAnswer(false)
     setError(null)
   }
@@ -317,7 +319,7 @@ const QuestionForm = () => {
               Analiză și Recomandări
             </h3>
           </div>
-          <AnswerDisplay answer={answer} />
+          <AnswerDisplay answer={answer} priorities={priorities} />
         </div>
 
         <button
