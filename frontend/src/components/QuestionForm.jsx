@@ -1039,7 +1039,15 @@ const QuestionForm = () => {
           <button
             type="button"
             onClick={handleNext}
-            disabled={loading || (currentQuestion.type !== 'checkbox' && !currentAnswer.trim()) || (currentQuestion.type === 'checkbox' && selectedCheckboxes.length === 0)}
+            disabled={
+              loading || 
+              (currentQuestion.type === 'checkbox' && selectedCheckboxes.length === 0) ||
+              (currentQuestion.type === 'napInputs' && (
+                (napInputs.length > 0 && napInputs.some(nap => !nap.startTime || !nap.duration || nap.duration === '0')) ||
+                !nightSleep.startTime || !nightSleep.duration || nightSleep.duration === '0' || parseFloat(nightSleep.duration) <= 0
+              )) ||
+              (currentQuestion.type !== 'checkbox' && currentQuestion.type !== 'napInputs' && !currentAnswer.trim())
+            }
             className="btn-primary flex-1"
           >
             {loading ? (
