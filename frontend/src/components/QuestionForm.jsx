@@ -272,10 +272,35 @@ const QuestionForm = () => {
         return
       }
       setError(null)
-      setAnswers({
+      const updatedAnswers = {
         ...answers,
         [currentQ.id]: selectedCheckboxes
-      })
+      }
+      setAnswers(updatedAnswers)
+
+      // Navighează la următoarea întrebare
+      let nextIndex = currentQuestionIndex + 1
+      while (nextIndex < questions.length) {
+        const nextQ = questions[nextIndex]
+        if (nextQ.conditional && nextQ.showIf) {
+          if (nextQ.showIf(updatedAnswers)) {
+            break
+          } else {
+            nextIndex++
+            continue
+          }
+        }
+        break
+      }
+
+      if (nextIndex < questions.length) {
+        setCurrentQuestionIndex(nextIndex)
+        setCurrentAnswer('')
+        setSelectedCheckboxes([])
+      } else {
+        handleSubmitAll()
+      }
+      return
     } else {
       // Validare pentru select
       if (currentQ.type === 'select') {
