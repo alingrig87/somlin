@@ -294,26 +294,37 @@ const QuestionForm = () => {
         }
       })
 
+      // Afișează avertismente dar permite trimiterea cu ce s-a primit
       if (missingFields.length > 0) {
         const errorMessages = missingFields.map(f => 
           `• ${f.question}: ${f.error}`
         ).join('\n')
-        setError(`Te rog completează toate întrebările:\n\n${errorMessages}`)
-        setLoading(false)
-        return
+        setError(`Atenție: Următoarele întrebări nu sunt completate:\n\n${errorMessages}\n\nRăspunsul va fi trimis cu informațiile disponibile.`)
+        // Nu returnăm aici - continuăm cu trimiterea
       }
 
-      // Construiește întrebarea completă cu toate răspunsurile
-      const problemsText = Array.isArray(answers.problems) ? answers.problems.join(', ') : ''
+      // Construiește întrebarea completă cu toate răspunsurile (folosind valori default pentru lipsuri)
+      const problemsText = Array.isArray(answers.problems) ? answers.problems.join(', ') : 'Nu a fost specificat'
       const napDetailsText = answers.napDetails || 'Nu a fost specificat'
-      const routineText = Array.isArray(answers.routine) ? answers.routine.join(', ') : answers.routine || 'Nu a fost specificat'
+      const routineText = answers.routine || 'Nu a fost specificat'
+      const ageText = answers.age || 'Nu a fost specificat'
+      const napsText = answers.numberOfNaps || 'Nu a fost specificat'
+      const sleepsWithText = answers.sleepsWith || 'Nu a fost specificat'
+      const routineConsistentText = answers.routineConsistent || 'Nu a fost specificat'
+      const wakesAtNightText = answers.wakesAtNight || 'Nu se trezește noaptea'
+      const goesOutsideText = answers.goesOutside || 'Nu a fost specificat'
+      const eatingBeforeSleepText = answers.eatingBeforeSleep || 'Nu a fost specificat'
+      const screenTimeText = answers.screenTime || 'Nu a fost specificat'
+      const loudMusicText = answers.loudMusic || 'Nu a fost specificat'
       
-      const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${answers.age} luni. Are ${answers.numberOfNaps} somnuri pe zi. Detalii somnuri de zi: ${napDetailsText}. Adoarme ${answers.sleepsWith}. Rutina de culcare: ${routineText}. Rutina este ${answers.routineConsistent}. ${answers.wakesAtNight ? `Se trezește noaptea: ${answers.wakesAtNight}.` : ''} ${answers.goesOutside ? `Iese afară: ${answers.goesOutside}.` : ''} ${answers.eatingBeforeSleep ? `Mănâncă cu ${answers.eatingBeforeSleep} înainte de somn.` : ''} ${answers.screenTime ? `Ecrane: ${answers.screenTime}.` : ''} ${answers.loudMusic ? `Muzică: ${answers.loudMusic}.` : ''} Ce recomandări ai pentru îmbunătățirea somnului?`
+      const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${ageText} luni. Are ${napsText} somnuri pe zi. Detalii somnuri de zi: ${napDetailsText}. Adoarme ${sleepsWithText}. Rutina de culcare: ${routineText}. Rutina este ${routineConsistentText}. Se trezește noaptea: ${wakesAtNightText}. Iese afară: ${goesOutsideText}. Mănâncă cu ${eatingBeforeSleepText} înainte de somn. Ecrane: ${screenTimeText}. Muzică: ${loudMusicText}. Ce recomandări ai pentru îmbunătățirea somnului?`
       
       const response = await askQuestion(fullQuestion, answers)
       setAnswer(response.answer)
       setPriorities(response.priorities || [])
       setShowFinalAnswer(true)
+      // Șterge eroarea după trimiterea cu succes
+      setError(null)
     } catch (err) {
       const errorMessage = err.response?.data?.error || err.message || 'Eroare necunoscută'
       setError(`Eroare la trimiterea întrebării:\n\n${errorMessage}\n\nVerifică dacă backend-ul rulează și dacă API key-ul Gemini este configurat.`)
