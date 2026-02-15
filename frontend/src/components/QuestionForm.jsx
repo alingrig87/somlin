@@ -326,6 +326,14 @@ const QuestionForm = () => {
 
   const handleAnswerChange = (value) => {
     setCurrentAnswer(value)
+    // Pentru select, salvează imediat răspunsul în answers pentru a evita probleme de validare
+    const currentQ = questions[currentQuestionIndex]
+    if (currentQ && currentQ.type === 'select' && value && value !== '' && value !== 'Selectează...') {
+      setAnswers(prev => ({
+        ...prev,
+        [currentQ.id]: value
+      }))
+    }
   }
 
   const handleCheckboxChange = (option) => {
