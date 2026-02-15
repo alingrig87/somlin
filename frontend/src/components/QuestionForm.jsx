@@ -12,6 +12,22 @@ const QuestionForm = () => {
 
   const questions = [
     {
+      id: "problems",
+      question: "Ce problemă vrei să rezolvi? (Poți selecta mai multe)",
+      type: "checkbox",
+      options: [
+        "Se trezește des noaptea",
+        "Nu doarme suficient",
+        "Adoarme greu",
+        "Se trezește devreme",
+        "Plânge în timpul nopții",
+        "Refuză să se culce",
+        "Somn fragmentat",
+        "Dificultate la somnurile de zi",
+        "Altele"
+      ]
+    },
+    {
       id: "age",
       question: "Câte luni are copilul?",
       type: "number",
@@ -24,6 +40,15 @@ const QuestionForm = () => {
       type: "number",
       placeholder: "ex: 2",
       validation: { min: 0, max: 6 }
+    },
+    {
+      id: "napDetails",
+      question: "Descrie somnurile de zi (ora și durata aproximativă)",
+      type: "textarea",
+      placeholder: "ex: Somn 1: 10:00-11:30 (1.5 ore), Somn 2: 14:00-15:30 (1.5 ore)",
+      conditional: true,
+      dependsOn: "numberOfNaps",
+      showIf: (answers) => parseInt(answers.numberOfNaps) > 0
     },
     {
       id: "sleepsWith",
@@ -76,36 +101,77 @@ const QuestionForm = () => {
   ]
 
   const [currentAnswer, setCurrentAnswer] = useState('')
+  const [selectedCheckboxes, setSelectedCheckboxes] = useState([])
 
   const handleAnswerChange = (value) => {
     setCurrentAnswer(value)
   }
 
-  const handleNext = () => {
-    if (!currentAnswer.trim()) {
-      setError('Te rog completează răspunsul')
-      return
-    }
+  const handleCheckboxChange = (option) => {
+    setSelectedCheckboxes(prev => {
+      if (prev.includes(option)) {
+        return prev.filter(item => item !== option)
+      } else {
+        return [...prev, option]
+      }
+    })
+  }
 
-    // Validare pentru număr
+  const handleNext = () => {
     const currentQ = questions[currentQuestionIndex]
-    if (currentQ.type === 'number') {
-      const num = parseInt(currentAnswer)
-      if (isNaN(num) || num < currentQ.validation.min || num > currentQ.validation.max) {
-        setError(`Te rog introdu un număr între ${currentQ.validation.min} și ${currentQ.validation.max}`)
+    
+    // Validare pentru checkboxes
+    if (currentQ.type === 'checkbox') {
+      if (selectedCheckboxes.length === 0) {
+        setError('Te rog selectează cel puțin o problemă')
         return
       }
+      setError(null)
+      setAnswers({
+        ...answers,
+        [currentQ.id]: selectedCheckboxes
+      })
+    } else {
+      if (!currentAnswer.trim()) {
+        setError('Te rog completează răspunsul')
+        return
+      }
+
+      // Validare pentru număr
+      if (currentQ.type === 'number') {
+        const num = parseInt(currentAnswer)
+        if (isNaN(num) || num < currentQ.validation.min || num > currentQ.validation.max) {
+          setError(`Te rog introdu un număr între ${currentQ.validation.min} și ${currentQ.validation.max}`)
+          return
+        }
+      }
+
+      setError(null)
+      setAnswers({
+        ...answers,
+        [currentQ.id]: currentAnswer
+      })
     }
 
-    setError(null)
-    setAnswers({
-      ...answers,
-      [currentQ.id]: currentAnswer
-    })
+    // Verifică dacă următoarea întrebare este condițională
+    let nextIndex = currentQuestionIndex + 1
+    while (nextIndex < questions.length) {
+      const nextQ = questions[nextIndex]
+      if (nextQ.conditional && nextQ.showIf) {
+        if (nextQ.showIf(answers)) {
+          break
+        } else {
+          nextIndex++
+          continue
+        }
+      }
+      break
+    }
 
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1)
+    if (nextIndex < questions.length) {
+      setCurrentQuestionIndex(nextIndex)
       setCurrentAnswer('')
+      setSelectedCheckboxes([])
     } else {
       // Toate întrebările au fost răspunse, trimite la backend
       handleSubmitAll()
@@ -114,10 +180,31 @@ const QuestionForm = () => {
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1)
-      const prevQ = questions[currentQuestionIndex - 1]
-      setCurrentAnswer(answers[prevQ.id] || '')
-      setError(null)
+      let prevIndex = currentQuestionIndex - 1
+      // Găsește întrebarea anterioară validă (sări peste cele condiționale care nu se aplică)
+      while (prevIndex >= 0) {
+        const prevQ = questions[prevIndex]
+        if (prevQ.conditional && prevQ.showIf) {
+          if (!prevQ.showIf(answers)) {
+            prevIndex--
+            continue
+          }
+        }
+        break
+      }
+      
+      if (prevIndex >= 0) {
+        setCurrentQuestionIndex(prevIndex)
+        const prevQ = questions[prevIndex]
+        if (prevQ.type === 'checkbox') {
+          setSelectedCheckboxes(Array.isArray(answers[prevQ.id]) ? answers[prevQ.id] : [])
+          setCurrentAnswer('')
+        } else {
+          setCurrentAnswer(answers[prevQ.id] || '')
+          setSelectedCheckboxes([])
+        }
+        setError(null)
+      }
     }
   }
 
@@ -127,7 +214,10 @@ const QuestionForm = () => {
 
     try {
       // Construiește întrebarea completă cu toate răspunsurile
-      const fullQuestion = `Copilul are ${answers.age} luni. Are ${answers.numberOfNaps} somnuri pe zi. Adoarme ${answers.sleepsWith}. Rutina de culcare: ${answers.routine}. Rutina este ${answers.routineConsistent}. ${answers.wakesAtNight ? `Se trezește noaptea: ${answers.wakesAtNight}.` : ''} ${answers.goesOutside ? `Iese afară: ${answers.goesOutside}.` : ''} ${answers.eatingBeforeSleep ? `Mănâncă cu ${answers.eatingBeforeSleep} înainte de somn.` : ''} ${answers.screenTime ? `Ecrane: ${answers.screenTime}.` : ''} ${answers.loudMusic ? `Muzică: ${answers.loudMusic}.` : ''} Ce recomandări ai pentru îmbunătățirea somnului?`
+      const problemsText = Array.isArray(answers.problems) ? answers.problems.join(', ') : ''
+      const napDetailsText = answers.napDetails || 'Nu a fost specificat'
+      
+      const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${answers.age} luni. Are ${answers.numberOfNaps} somnuri pe zi. Detalii somnuri de zi: ${napDetailsText}. Adoarme ${answers.sleepsWith}. Rutina de culcare: ${answers.routine}. Rutina este ${answers.routineConsistent}. ${answers.wakesAtNight ? `Se trezește noaptea: ${answers.wakesAtNight}.` : ''} ${answers.goesOutside ? `Iese afară: ${answers.goesOutside}.` : ''} ${answers.eatingBeforeSleep ? `Mănâncă cu ${answers.eatingBeforeSleep} înainte de somn.` : ''} ${answers.screenTime ? `Ecrane: ${answers.screenTime}.` : ''} ${answers.loudMusic ? `Muzică: ${answers.loudMusic}.` : ''} Ce recomandări ai pentru îmbunătățirea somnului?`
       
       const response = await askQuestion(fullQuestion, answers)
       setAnswer(response.answer)
@@ -149,17 +239,50 @@ const QuestionForm = () => {
     setError(null)
   }
 
+  // Calculează numărul real de întrebări (excludând cele condiționale care nu se aplică)
+  const getVisibleQuestionsCount = () => {
+    let count = 0
+    const tempAnswers = { ...answers }
+    questions.forEach((q, idx) => {
+      if (idx <= currentQuestionIndex || !q.conditional || !q.showIf) {
+        if (!q.conditional || !q.showIf || q.showIf(tempAnswers)) {
+          count++
+        }
+      }
+    })
+    return count
+  }
+
+  const getTotalQuestionsCount = () => {
+    let count = 0
+    questions.forEach((q) => {
+      if (!q.conditional || !q.showIf || q.showIf(answers)) {
+        count++
+      }
+    })
+    return count
+  }
+
   const currentQuestion = questions[currentQuestionIndex]
-  const progress = ((currentQuestionIndex + 1) / questions.length) * 100
+  const totalQuestions = getTotalQuestionsCount()
+  const currentQuestionNumber = currentQuestionIndex + 1
+  const progress = (currentQuestionNumber / totalQuestions) * 100
 
   // Restaurează răspunsul dacă există
   useEffect(() => {
-    if (currentQuestion && answers[currentQuestion.id]) {
-      setCurrentAnswer(answers[currentQuestion.id])
+    if (currentQuestion) {
+      if (currentQuestion.type === 'checkbox') {
+        setSelectedCheckboxes(Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id] : [])
+        setCurrentAnswer('')
+      } else {
+        setCurrentAnswer(answers[currentQuestion.id] || '')
+        setSelectedCheckboxes([])
+      }
     } else {
       setCurrentAnswer('')
+      setSelectedCheckboxes([])
     }
-  }, [currentQuestionIndex])
+  }, [currentQuestionIndex, currentQuestion])
 
   if (showFinalAnswer) {
     return (
@@ -223,7 +346,7 @@ const QuestionForm = () => {
           ></div>
         </div>
         <p className="text-sm text-gray-500 text-center">
-          Întrebare {currentQuestionIndex + 1} din {questions.length}
+          Întrebare {currentQuestionNumber} din {totalQuestions}
         </p>
       </div>
 
@@ -233,7 +356,25 @@ const QuestionForm = () => {
             {currentQuestion.question}
           </label>
           
-          {currentQuestion.type === 'select' ? (
+          {currentQuestion.type === 'checkbox' ? (
+            <div className="space-y-3">
+              {currentQuestion.options.map((option) => (
+                <label
+                  key={option}
+                  className="flex items-center space-x-3 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedCheckboxes.includes(option)}
+                    onChange={() => handleCheckboxChange(option)}
+                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    disabled={loading}
+                  />
+                  <span className="text-gray-700 flex-1">{option}</span>
+                </label>
+              ))}
+            </div>
+          ) : currentQuestion.type === 'select' ? (
             <select
               id="answer"
               value={currentAnswer}
@@ -308,7 +449,7 @@ const QuestionForm = () => {
           <button
             type="button"
             onClick={handleNext}
-            disabled={loading || !currentAnswer.trim()}
+            disabled={loading || (currentQuestion.type !== 'checkbox' && !currentAnswer.trim()) || (currentQuestion.type === 'checkbox' && selectedCheckboxes.length === 0)}
             className="btn-primary flex-1"
           >
             {loading ? (

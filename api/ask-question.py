@@ -44,7 +44,74 @@ def load_sleep_context():
 
 def build_gemini_prompt(question: str, answers: dict) -> str:
     """Construiește prompt-ul complet pentru Gemini"""
-    age_months = int(answers.get('age', 0))
+    age_months = int(answers.get('age', 0) or 0)
+    
+    # Informații despre vârstă pentru recomandări
+    age_info = ""
+    if age_months > 0:
+        if age_months <= 3:
+            age_info = f"""
+INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 0-3 luni):
+- Somn total recomandat: 14-17 ore (optim: 15.5 ore)
+- Număr de somnuri recomandat: 4-6 somnuri (optim: 5)
+- Durată somn nocturn: 8-10 ore (optim: 9 ore)
+- Ferestre de veghe (PV): 45-90 minute
+- Ora culcării recomandată: 19:00-20:00
+"""
+        elif age_months <= 6:
+            age_info = f"""
+INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 3-6 luni):
+- Somn total recomandat: 13-16 ore (optim: 14.5 ore)
+- Număr de somnuri recomandat: 3-5 somnuri (optim: 4)
+- Durată somn nocturn: 9-11 ore (optim: 10 ore)
+- Ferestre de veghe (PV): 1.5-2.5 ore
+- Ora culcării recomandată: 19:00-20:00
+"""
+        elif age_months <= 12:
+            age_info = f"""
+INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 6-12 luni):
+- Somn total recomandat: 12-15 ore (optim: 13.5 ore)
+- Număr de somnuri recomandat: 2-3 somnuri (optim: 2)
+- Durată somn nocturn: 10-12 ore (optim: 11 ore)
+- Ferestre de veghe (PV): 2.5-4 ore
+- Ora culcării recomandată: 19:00-20:00
+"""
+        elif age_months <= 18:
+            age_info = f"""
+INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 12-18 luni):
+- Somn total recomandat: 11-14 ore (optim: 12.5 ore)
+- Număr de somnuri recomandat: 1-2 somnuri (optim: 2)
+- Durată somn nocturn: 10-12 ore (optim: 11 ore)
+- Ferestre de veghe (PV): 4-5 ore
+- Ora culcării recomandată: 19:00-20:00
+"""
+        elif age_months <= 24:
+            age_info = f"""
+INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 18-24 luni):
+- Somn total recomandat: 11-14 ore (optim: 12.5 ore)
+- Număr de somnuri recomandat: 1-2 somnuri (optim: 1)
+- Durată somn nocturn: 10-12 ore (optim: 11 ore)
+- Ferestre de veghe (PV): 5-6 ore
+- Ora culcării recomandată: 19:00-20:00
+"""
+        elif age_months <= 36:
+            age_info = f"""
+INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 2-3 ani):
+- Somn total recomandat: 10-13 ore (optim: 11.5 ore)
+- Număr de somnuri recomandat: 0-1 somn (optim: 1)
+- Durată somn nocturn: 10-12 ore (optim: 11 ore)
+- Ferestre de veghe (PV): 5.5-6.5 ore
+- Ora culcării recomandată: 19:00-20:00
+"""
+        else:
+            age_info = f"""
+INFORMAȚII DESPRE VÂRSTA COPILULUI ({age_months} luni - 3-4 ani):
+- Somn total recomandat: 10-13 ore (optim: 11.5 ore)
+- Număr de somnuri recomandat: 0-1 somn (optim: 0)
+- Durată somn nocturn: 10-12 ore (optim: 11 ore)
+- Ferestre de veghe (PV): 6-7 ore
+- Ora culcării recomandată: 19:00-20:30
+"""
     
     context = f"""
 PRINCIPII FUNDAMENTALE PENTRU SOMN OPTIMAL (APLICĂ ÎNTOTDEAUNA):
@@ -80,11 +147,15 @@ PRINCIPII FUNDAMENTALE PENTRU SOMN OPTIMAL (APLICĂ ÎNTOTDEAUNA):
     
     prompt = f"""Ești Ruxandra Trufașu, somnolog expert specializat în somnul copiilor (0-4 ani), cu experiență vastă în consilierea părinților.
 
+{age_info}
+
 {context}
 
 DATE DESPRE COPILUL PĂRINTELUI:
 - Vârstă: {answers.get('age', 'necunoscută')} luni
+- Probleme raportate: {', '.join(answers.get('problems', [])) if isinstance(answers.get('problems'), list) else answers.get('problems', 'necunoscut')}
 - Număr somnuri pe zi: {answers.get('numberOfNaps', 'necunoscut')}
+- Detalii somnuri de zi: {answers.get('napDetails', 'necunoscut')}
 - Adoarme cu: {answers.get('sleepsWith', 'necunoscut')}
 - Rutină de culcare: {answers.get('routine', 'necunoscută')}
 - Rutina este: {answers.get('routineConsistent', 'necunoscută')}
