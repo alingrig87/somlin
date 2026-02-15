@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { askQuestion } from '../services/api'
+import AnswerDisplay from './AnswerDisplay'
 
 const QuestionForm = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -172,26 +173,26 @@ const QuestionForm = () => {
           </p>
         </div>
 
-        <div className="mb-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-            <svg
-              className="w-5 h-5 text-blue-600 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Analiză și Recomandări
-          </h3>
-          <div className="prose prose-sm max-w-none">
-            <p className="text-gray-700 whitespace-pre-wrap">{answer}</p>
+        <div className="mb-6">
+          <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-lg">
+            <h3 className="text-xl font-bold text-gray-900 flex items-center">
+              <svg
+                className="w-6 h-6 text-blue-600 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Analiză și Recomandări
+            </h3>
           </div>
+          <AnswerDisplay answer={answer} />
         </div>
 
         <button
