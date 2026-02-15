@@ -64,18 +64,9 @@ const QuestionForm = () => {
     },
     {
       id: "routine",
-      question: "Care este rutina de culcare? Selectează activitățile principale.",
-      type: "checkbox",
-      options: [
-        "Baie",
-        "Masaj",
-        "Poveste",
-        "Cântec",
-        "Citit",
-        "Joc liniștit",
-        "Lumină stinsă/estompată",
-        "Altele"
-      ]
+      question: "Care este rutina de culcare? Descrie activitățile în ordine.",
+      type: "textarea",
+      placeholder: "ex: baie, masaj, poveste, cântec, lumină stinsă"
     },
     {
       id: "routineConsistent",
