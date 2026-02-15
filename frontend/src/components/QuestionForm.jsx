@@ -373,6 +373,7 @@ const QuestionForm = () => {
         setCurrentQuestionIndex(nextIndex)
         setCurrentAnswer('')
         setSelectedCheckboxes([])
+        setError(null) // Șterge orice eroare anterioară
       } else {
         handleSubmitAll()
       }
