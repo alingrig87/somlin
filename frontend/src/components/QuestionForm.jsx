@@ -64,9 +64,18 @@ const QuestionForm = () => {
     },
     {
       id: "routine",
-      question: "Care este rutina de culcare? Descrie activitățile în ordine.",
-      type: "textarea",
-      placeholder: "ex: baie, masaj, poveste, cântec, lumină stinsă"
+      question: "Care este rutina de culcare? Selectează activitățile principale.",
+      type: "checkbox",
+      options: [
+        "Baie",
+        "Masaj",
+        "Poveste",
+        "Cântec",
+        "Citit",
+        "Joc liniștit",
+        "Lumină stinsă/estompată",
+        "Altele"
+      ]
     },
     {
       id: "routineConsistent",
@@ -255,18 +264,68 @@ const QuestionForm = () => {
     setError(null)
 
     try {
+      // Validare completă - verifică toate întrebările obligatorii
+      const missingFields = []
+      const allQuestions = questions.filter(q => {
+        // Sari peste întrebările condiționale care nu se aplică
+        if (q.conditional && q.showIf && !q.showIf(answers)) {
+          return false
+        }
+        return true
+      })
+
+      allQuestions.forEach(q => {
+        const answer = answers[q.id]
+        if (q.type === 'checkbox') {
+          if (!Array.isArray(answer) || answer.length === 0) {
+            missingFields.push({
+              question: q.question,
+              field: q.id,
+              error: 'Nu ai selectat nicio opțiune'
+            })
+          }
+        } else if (q.type === 'select') {
+          if (!answer || answer === '' || answer === 'Selectează...') {
+            missingFields.push({
+              question: q.question,
+              field: q.id,
+              error: 'Nu ai selectat o opțiune'
+            })
+          }
+        } else if (q.type === 'textarea' || q.type === 'text') {
+          if (!answer || answer.trim() === '') {
+            missingFields.push({
+              question: q.question,
+              field: q.id,
+              error: 'Nu ai completat răspunsul'
+            })
+          }
+        }
+      })
+
+      if (missingFields.length > 0) {
+        const errorMessages = missingFields.map(f => 
+          `• ${f.question}: ${f.error}`
+        ).join('\n')
+        setError(`Te rog completează toate întrebările:\n\n${errorMessages}`)
+        setLoading(false)
+        return
+      }
+
       // Construiește întrebarea completă cu toate răspunsurile
       const problemsText = Array.isArray(answers.problems) ? answers.problems.join(', ') : ''
       const napDetailsText = answers.napDetails || 'Nu a fost specificat'
+      const routineText = Array.isArray(answers.routine) ? answers.routine.join(', ') : answers.routine || 'Nu a fost specificat'
       
-      const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${answers.age} luni. Are ${answers.numberOfNaps} somnuri pe zi. Detalii somnuri de zi: ${napDetailsText}. Adoarme ${answers.sleepsWith}. Rutina de culcare: ${answers.routine}. Rutina este ${answers.routineConsistent}. ${answers.wakesAtNight ? `Se trezește noaptea: ${answers.wakesAtNight}.` : ''} ${answers.goesOutside ? `Iese afară: ${answers.goesOutside}.` : ''} ${answers.eatingBeforeSleep ? `Mănâncă cu ${answers.eatingBeforeSleep} înainte de somn.` : ''} ${answers.screenTime ? `Ecrane: ${answers.screenTime}.` : ''} ${answers.loudMusic ? `Muzică: ${answers.loudMusic}.` : ''} Ce recomandări ai pentru îmbunătățirea somnului?`
+      const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${answers.age} luni. Are ${answers.numberOfNaps} somnuri pe zi. Detalii somnuri de zi: ${napDetailsText}. Adoarme ${answers.sleepsWith}. Rutina de culcare: ${routineText}. Rutina este ${answers.routineConsistent}. ${answers.wakesAtNight ? `Se trezește noaptea: ${answers.wakesAtNight}.` : ''} ${answers.goesOutside ? `Iese afară: ${answers.goesOutside}.` : ''} ${answers.eatingBeforeSleep ? `Mănâncă cu ${answers.eatingBeforeSleep} înainte de somn.` : ''} ${answers.screenTime ? `Ecrane: ${answers.screenTime}.` : ''} ${answers.loudMusic ? `Muzică: ${answers.loudMusic}.` : ''} Ce recomandări ai pentru îmbunătățirea somnului?`
       
       const response = await askQuestion(fullQuestion, answers)
       setAnswer(response.answer)
       setPriorities(response.priorities || [])
       setShowFinalAnswer(true)
     } catch (err) {
-      setError(err.message || 'Eroare la trimiterea întrebării. Verifică dacă backend-ul rulează și dacă API key-ul Gemini este configurat.')
+      const errorMessage = err.response?.data?.error || err.message || 'Eroare necunoscută'
+      setError(`Eroare la trimiterea întrebării:\n\n${errorMessage}\n\nVerifică dacă backend-ul rulează și dacă API key-ul Gemini este configurat.`)
       console.error('Question error:', err)
     } finally {
       setLoading(false)
@@ -461,10 +520,10 @@ const QuestionForm = () => {
         </div>
 
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="p-4 bg-red-50 border-2 border-red-300 rounded-lg shadow-sm">
             <div className="flex items-start">
               <svg
-                className="w-5 h-5 text-red-600 mt-0.5 mr-2"
+                className="w-6 h-6 text-red-600 mt-0.5 mr-3 flex-shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -476,7 +535,10 @@ const QuestionForm = () => {
                   d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <p className="text-red-800 text-sm">{error}</p>
+              <div className="flex-1">
+                <h4 className="text-red-900 font-bold mb-2 text-base">Eroare:</h4>
+                <pre className="text-red-800 text-sm whitespace-pre-wrap font-medium leading-relaxed">{error}</pre>
+              </div>
             </div>
           </div>
         )}
