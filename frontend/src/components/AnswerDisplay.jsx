@@ -139,7 +139,7 @@ const AnswerDisplay = ({ answer, priorities = [] }) => {
     return text.trim()
   }
 
-  const renderContent = (content) => {
+  const renderContent = (content, isPositive = false) => {
     return content.map((line, idx) => {
       const trimmed = line.trim()
       if (!trimmed) return null
@@ -153,16 +153,18 @@ const AnswerDisplay = ({ answer, priorities = [] }) => {
         const text = cleaned.replace(/^[-–•]\s*/, '').trim()
         if (!text) return null
         return (
-          <div key={idx} className="flex items-start mb-2">
-            <span className="text-gray-400 mr-3 mt-1.5 flex-shrink-0">•</span>
-            <span className="flex-1 text-gray-700 leading-relaxed">{text}</span>
+          <div key={idx} className="flex items-start mb-3 group">
+            <span className={`${isPositive ? 'text-green-600' : 'text-amber-600'} mr-3 mt-1.5 flex-shrink-0 text-lg font-bold`}>
+              {isPositive ? '✓' : '•'}
+            </span>
+            <span className="flex-1 leading-relaxed font-medium">{text}</span>
           </div>
         )
       }
       
       // Text normal
       return (
-        <p key={idx} className="mb-3 text-gray-700 leading-relaxed last:mb-0">
+        <p key={idx} className="mb-3 leading-relaxed last:mb-0 font-medium">
           {cleaned}
         </p>
       )
@@ -186,13 +188,13 @@ const AnswerDisplay = ({ answer, priorities = [] }) => {
           <div key={index} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
             {/* Titlu secțiune principală */}
             {section.title && (
-              <div className="flex items-center mb-6 pb-4 border-b border-gray-200">
-                <div className="bg-blue-100 rounded-lg p-2 mr-3">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <div className="flex items-center mb-6 pb-4 border-b-2 border-gray-300">
+                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-3 mr-4 shadow-lg">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">{section.title}</h3>
+                <h3 className="text-2xl font-bold text-gray-900">{section.title}</h3>
               </div>
             )}
 
@@ -204,39 +206,43 @@ const AnswerDisplay = ({ answer, priorities = [] }) => {
                     switch (subsection.type) {
                       case 'positive':
                         return {
-                          bg: 'bg-emerald-50',
-                          border: 'border-emerald-200',
-                          iconBg: 'bg-emerald-100',
-                          iconColor: 'text-emerald-600',
-                          titleColor: 'text-emerald-900',
-                          dotColor: 'text-emerald-500'
+                          bg: 'bg-gradient-to-br from-green-50 via-emerald-50 to-green-100',
+                          border: 'border-green-400',
+                          iconBg: 'bg-gradient-to-br from-green-500 to-emerald-600',
+                          iconColor: 'text-white',
+                          titleColor: 'text-green-800',
+                          textColor: 'text-green-900',
+                          badge: 'bg-green-200 text-green-800'
                         }
                       case 'negative':
                         return {
-                          bg: 'bg-amber-50',
-                          border: 'border-amber-200',
-                          iconBg: 'bg-amber-100',
-                          iconColor: 'text-amber-600',
-                          titleColor: 'text-amber-900',
-                          dotColor: 'text-amber-500'
+                          bg: 'bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100',
+                          border: 'border-amber-400',
+                          iconBg: 'bg-gradient-to-br from-amber-500 to-orange-600',
+                          iconColor: 'text-white',
+                          titleColor: 'text-amber-800',
+                          textColor: 'text-amber-900',
+                          badge: 'bg-amber-200 text-amber-800'
                         }
                       case 'problem':
                         return {
-                          bg: 'bg-red-50',
-                          border: 'border-red-200',
-                          iconBg: 'bg-red-100',
-                          iconColor: 'text-red-600',
-                          titleColor: 'text-red-900',
-                          dotColor: 'text-red-500'
+                          bg: 'bg-gradient-to-br from-red-50 via-pink-50 to-red-100',
+                          border: 'border-red-400',
+                          iconBg: 'bg-gradient-to-br from-red-500 to-pink-600',
+                          iconColor: 'text-white',
+                          titleColor: 'text-red-800',
+                          textColor: 'text-red-900',
+                          badge: 'bg-red-200 text-red-800'
                         }
                       default:
                         return {
-                          bg: 'bg-gray-50',
-                          border: 'border-gray-200',
-                          iconBg: 'bg-gray-100',
-                          iconColor: 'text-gray-600',
-                          titleColor: 'text-gray-900',
-                          dotColor: 'text-gray-500'
+                          bg: 'bg-gradient-to-br from-blue-50 to-indigo-50',
+                          border: 'border-blue-300',
+                          iconBg: 'bg-blue-500',
+                          iconColor: 'text-white',
+                          titleColor: 'text-blue-800',
+                          textColor: 'text-blue-900',
+                          badge: 'bg-blue-200 text-blue-800'
                         }
                     }
                   }
@@ -246,32 +252,58 @@ const AnswerDisplay = ({ answer, priorities = [] }) => {
                   return (
                     <div
                       key={subIdx}
-                      className={`${styles.bg} ${styles.border} border rounded-lg p-5`}
+                      className={`${styles.bg} ${styles.border} border-2 rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow`}
                     >
-                      <div className="flex items-center mb-3">
-                        <div className={`${styles.iconBg} ${styles.iconColor} rounded-lg p-1.5 mr-3`}>
+                      <div className="flex items-center mb-4">
+                        <div className={`${styles.iconBg} ${styles.iconColor} rounded-full p-3 mr-4 flex-shrink-0 shadow-sm`}>
                           {subsection.type === 'positive' && (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                             </svg>
                           )}
                           {subsection.type === 'negative' && (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
                           )}
                           {subsection.type === 'problem' && (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           )}
                         </div>
-                        <h4 className={`${styles.titleColor} font-semibold text-base`}>
-                          {subsection.title}
-                        </h4>
+                        <div className="flex-1">
+                          <h4 className={`${styles.titleColor} font-bold text-xl mb-2 flex items-center flex-wrap gap-2`}>
+                            <span>{subsection.title}</span>
+                            {subsection.type === 'positive' && (
+                              <span className="text-sm bg-green-200 text-green-800 px-3 py-1.5 rounded-full font-bold shadow-sm flex items-center gap-1">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                BINE
+                              </span>
+                            )}
+                            {subsection.type === 'negative' && (
+                              <span className="text-sm bg-amber-200 text-amber-800 px-3 py-1.5 rounded-full font-bold shadow-sm flex items-center gap-1">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                                ATENȚIE
+                              </span>
+                            )}
+                            {subsection.type === 'problem' && (
+                              <span className="text-sm bg-red-200 text-red-800 px-3 py-1.5 rounded-full font-bold shadow-sm flex items-center gap-1">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                                URGENT
+                              </span>
+                            )}
+                          </h4>
+                        </div>
                       </div>
-                      <div className="text-gray-700 leading-relaxed space-y-2 ml-11">
-                        {renderContent(subsection.content)}
+                      <div className={`${styles.textColor || 'text-gray-800'} leading-relaxed space-y-3 ml-16`}>
+                        {renderContent(subsection.content, subsection.type === 'positive', subsection.type === 'negative')}
                       </div>
                     </div>
                   )
