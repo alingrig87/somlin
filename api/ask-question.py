@@ -236,6 +236,8 @@ CERINȚE PENTRU RĂSPUNS:
 5. **Structură clară**:
    - Organizează răspunsul pe paliere/aspecte
    - Pentru fiecare palier: ce face bine, ce nu face bine, ce trebuie schimbat
+   - IMPORTANT: Nu lăsa titluri goale sau incomplete (ex: "Somnuri:" fără explicație). Fiecare secțiune trebuie să aibă conținut complet și detaliat.
+   - Dacă menționezi un aspect (ex: "Somnuri:", "Ecrane:", "Rutină:"), explică imediat ce face bine sau ce nu face bine, nu doar menționa titlul.
 
 IMPORTANT:
 - Răspunde ÎNTOTDEAUNA în limba română

@@ -139,33 +139,74 @@ const AnswerDisplay = ({ answer, priorities = [] }) => {
     return text.trim()
   }
 
-  const renderContent = (content, isPositive = false) => {
-    return content.map((line, idx) => {
-      const trimmed = line.trim()
-      if (!trimmed) return null
+  const renderContent = (content, isPositive = false, isNegative = false) => {
+    if (!content || content.length === 0) return null
+    
+    // Filtrează și combină liniile goale sau incomplete
+    const processedContent = []
+    for (let i = 0; i < content.length; i++) {
+      const trimmed = content[i].trim()
+      if (!trimmed) continue
       
-      // Curăță textul de markdown
       const cleaned = cleanText(trimmed)
-      if (!cleaned) return null
+      if (!cleaned) continue
+      
+      // Verifică dacă este doar un titlu fără conținut (ex: "Somnuri:", "Ecrane:", "Adoarme cu bunica:")
+      // Un titlu gol este un cuvânt sau frază scurtă care se termină cu ":" și nu are conținut după
+      const isTitleOnly = cleaned.match(/^[A-ZĂÂÎȘȚ][^:]*:\s*$/) && cleaned.length < 50
+      
+      if (isTitleOnly) {
+        // Încearcă să combine cu următoarea linie dacă există
+        if (i + 1 < content.length) {
+          const nextLine = cleanText(content[i + 1].trim())
+          if (nextLine && nextLine.length > 0 && !nextLine.match(/^[A-ZĂÂÎȘȚ][^:]*:\s*$/)) {
+            // Combină titlul cu următoarea linie
+            processedContent.push(`${cleaned.replace(/:\s*$/, '')}: ${nextLine}`)
+            i++ // Sare peste următoarea linie deoarece am combinat-o
+            continue
+          }
+        }
+        // Dacă nu există următoarea linie sau este goală, ignoră titlul gol
+        continue
+      }
+      
+      processedContent.push(cleaned)
+    }
+    
+    if (processedContent.length === 0) return null
+    
+    return processedContent.map((line, idx) => {
+      if (!line) return null
       
       // Detectează bullet points
-      if (cleaned.match(/^[-–•]\s/) || trimmed.match(/^[-*–•]\s/)) {
-        const text = cleaned.replace(/^[-–•]\s*/, '').trim()
+      if (line.match(/^[-–•]\s/) || line.match(/^[-*–•]\s/)) {
+        const text = line.replace(/^[-–•]\s*/, '').trim()
         if (!text) return null
+        
+        let iconColor = 'text-gray-600'
+        let icon = '•'
+        if (isPositive) {
+          iconColor = 'text-green-600'
+          icon = '✓'
+        } else if (isNegative) {
+          iconColor = 'text-amber-600'
+          icon = '⚠'
+        }
+        
         return (
-          <div key={idx} className="flex items-start mb-3 group">
-            <span className={`${isPositive ? 'text-green-600' : 'text-amber-600'} mr-3 mt-1.5 flex-shrink-0 text-lg font-bold`}>
-              {isPositive ? '✓' : '•'}
+          <div key={idx} className="flex items-start mb-3 group hover:bg-opacity-50 transition-colors">
+            <span className={`${iconColor} mr-3 mt-1.5 flex-shrink-0 text-xl font-bold`}>
+              {icon}
             </span>
-            <span className="flex-1 leading-relaxed font-medium">{text}</span>
+            <span className="flex-1 leading-relaxed font-semibold text-base">{text}</span>
           </div>
         )
       }
       
       // Text normal
       return (
-        <p key={idx} className="mb-3 leading-relaxed last:mb-0 font-medium">
-          {cleaned}
+        <p key={idx} className="mb-3 leading-relaxed last:mb-0 font-semibold text-base">
+          {line}
         </p>
       )
     })
