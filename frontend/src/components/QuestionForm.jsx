@@ -542,7 +542,8 @@ const QuestionForm = () => {
             })
           }
         } else if (q.type === 'select') {
-          if (!answer || answer === '' || answer === 'Selectează...') {
+          // Verifică dacă răspunsul este gol, undefined, null sau este opțiunea default
+          if (!answer || answer === '' || answer === 'Selectează...' || (typeof answer === 'string' && answer.trim() === '')) {
             missingFields.push({
               question: q.question,
               field: q.id,
