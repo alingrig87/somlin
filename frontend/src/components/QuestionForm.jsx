@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { askQuestion } from '../services/api'
 import AnswerDisplay from './AnswerDisplay'
+import { generatePDF } from '../utils/generatePDF'
 
 const QuestionForm = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -593,7 +594,6 @@ const QuestionForm = () => {
         <div className="flex gap-4 mb-4">
           <button
             onClick={() => {
-              const { generatePDF } = require('../utils/generatePDF')
               const doc = generatePDF(answers, answer, priorities)
               const fileName = `Plan_Somn_${answers.age || 'copil'}_luni_${new Date().toISOString().split('T')[0]}.pdf`
               doc.save(fileName)
@@ -607,7 +607,6 @@ const QuestionForm = () => {
           </button>
           <button
             onClick={() => {
-              const { generatePDF } = require('../utils/generatePDF')
               const doc = generatePDF(answers, answer, priorities)
               const pdfBlob = doc.output('blob')
               const pdfUrl = URL.createObjectURL(pdfBlob)
