@@ -57,6 +57,12 @@ const QuestionForm = () => {
       }
     },
     {
+      id: "bedtimeStart",
+      question: "La ce oră începe rutina de culcare (somnul de noapte)?",
+      type: "time",
+      placeholder: "ex: 19:00"
+    },
+    {
       id: "sleepsWith",
       question: "Cu cine adoarme copilul?",
       type: "select",
@@ -474,7 +480,7 @@ const QuestionForm = () => {
       const screenTimeText = answers.screenTime || 'Nu a fost specificat'
       const loudMusicText = answers.loudMusic || 'Nu a fost specificat'
       
-      const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${ageText} luni. Are ${napsText} somnuri pe zi. Detalii somnuri de zi: ${napDetailsText}${wakeWindowsText}. Adoarme ${sleepsWithText}. Rutina de culcare: ${routineText}. Rutina este ${routineConsistentText}. Se trezește noaptea: ${wakesAtNightText}. Iese afară: ${goesOutsideText}. Mănâncă cu ${eatingBeforeSleepText} înainte de somn. Ecrane: ${screenTimeText}. Muzică: ${loudMusicText}. Ce recomandări ai pentru îmbunătățirea somnului? Analizează și interpretează PV-urile calculate și spune dacă sunt potrivite pentru vârsta copilului.`
+      const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${ageText} luni. Are ${napsText} somnuri de zi. Detalii somnuri de zi: ${napDetailsText}${wakeWindowsText}. Somnul de noapte începe la: ${bedtimeStartText}. Adoarme ${sleepsWithText}. Rutina de culcare: ${routineText}. Rutina este ${routineConsistentText}. Se trezește noaptea: ${wakesAtNightText}. Iese afară: ${goesOutsideText}. Mănâncă cu ${eatingBeforeSleepText} înainte de somn. Ecrane: ${screenTimeText}. Muzică: ${loudMusicText}. Ce recomandări ai pentru îmbunătățirea somnului? Analizează și interpretează PV-urile calculate și spune dacă sunt potrivite pentru vârsta copilului.`
       
       const response = await askQuestion(fullQuestion, cleanedAnswers)
       setAnswer(response.answer)
@@ -713,6 +719,15 @@ const QuestionForm = () => {
                 </div>
               )}
             </div>
+          ) : currentQuestion.type === 'time' ? (
+            <input
+              id="answer"
+              type="time"
+              value={currentAnswer}
+              onChange={(e) => handleAnswerChange(e.target.value)}
+              className="input-field"
+              disabled={loading}
+            />
           ) : currentQuestion.type === 'textarea' ? (
             <textarea
               id="answer"
