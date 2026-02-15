@@ -6,6 +6,7 @@ const QuestionForm = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [answer, setAnswer] = useState('')
+  const [priorities, setPriorities] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showFinalAnswer, setShowFinalAnswer] = useState(false)
