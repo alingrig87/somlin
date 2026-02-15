@@ -12,6 +12,7 @@ const QuestionForm = () => {
   const [error, setError] = useState(null)
   const [showFinalAnswer, setShowFinalAnswer] = useState(false)
   const [napInputs, setNapInputs] = useState([]) // [{startTime: "10:00", duration: "90"}, ...]
+  const [nightSleep, setNightSleep] = useState({ startTime: '', duration: '' }) // Somnul de noapte
   const [wakeWindows, setWakeWindows] = useState([]) // Calculated PV-uri
 
   const questions = [
@@ -45,7 +46,7 @@ const QuestionForm = () => {
     },
     {
       id: "napDetails",
-      question: "Detalii somnuri de zi",
+      question: "Detalii somnuri de zi și somnul de noapte",
       type: "napInputs",
       conditional: true,
       dependsOn: "numberOfNaps",
@@ -54,14 +55,8 @@ const QuestionForm = () => {
         if (!naps) return false
         // Gestionează atât string cât și număr
         const napsNum = typeof naps === 'string' ? parseInt(naps.replace(/[^\d]/g, '')) : parseInt(naps)
-        return !isNaN(napsNum) && napsNum > 0
+        return !isNaN(napsNum) && napsNum >= 0
       }
-    },
-    {
-      id: "bedtimeStart",
-      question: "La ce oră începe rutina de culcare (somnul de noapte)?",
-      type: "time",
-      placeholder: "ex: 19:00"
     },
     {
       id: "sleepsWith",
@@ -191,14 +186,23 @@ const QuestionForm = () => {
         // Calculează ora de sfârșit a somnului curent
         const [startHour, startMin] = currentNap.startTime.split(':').map(Number)
         const durationMinutes = parseInt(currentNap.duration) || 0
-        const endTime = new Date(2000, 0, 1, startHour, startMin + durationMinutes)
+        
+        // Calculează minutele totale de la începutul zilei
+        const startTotalMinutes = startHour * 60 + startMin
+        const endTotalMinutes = startTotalMinutes + durationMinutes
         
         // Calculează ora de început a următorului somn
         const [nextHour, nextMin] = nextNap.startTime.split(':').map(Number)
-        const nextStartTime = new Date(2000, 0, 1, nextHour, nextMin)
+        const nextStartTotalMinutes = nextHour * 60 + nextMin
         
         // Calculează diferența în minute
-        const pvMinutes = (nextStartTime - endTime) / (1000 * 60)
+        // Dacă următorul somn este a doua zi, adaugă 24 ore
+        let pvMinutes = nextStartTotalMinutes - endTotalMinutes
+        if (pvMinutes < 0) {
+          // Dacă este negativ, înseamnă că următorul somn este a doua zi
+          pvMinutes = (24 * 60) + pvMinutes
+        }
+        
         const pvHours = pvMinutes / 60
 
         // Obține PV-urile recomandate pentru vârstă
@@ -219,25 +223,90 @@ const QuestionForm = () => {
           recommendedPV = { min: 6, max: 7, optimal: 6.5 }
         }
 
-        // Verifică dacă PV-ul este ok
+        // Verifică dacă PV-ul este ok (doar dacă este pozitiv și rezonabil)
+        if (pvHours >= 0 && pvHours <= 24) {
+          const isOk = pvHours >= recommendedPV.min && pvHours <= recommendedPV.max
+          const isTooShort = pvHours < recommendedPV.min
+          const isTooLong = pvHours > recommendedPV.max
+
+          calculatedPVs.push({
+            fromNap: i + 1,
+            toNap: i + 2,
+            pvHours: pvHours.toFixed(1),
+            recommended: recommendedPV,
+            isOk,
+            isTooShort,
+            isTooLong
+          })
+        } else {
+          // Dacă PV-ul este negativ sau prea mare, înseamnă că datele sunt incorecte
+          calculatedPVs.push({
+            fromNap: i + 1,
+            toNap: i + 2,
+            pvHours: pvHours.toFixed(1),
+            recommended: recommendedPV,
+            isOk: false,
+            isTooShort: true,
+            isTooLong: false,
+            error: true
+          })
+        }
+      }
+    }
+
+    // Calculează PV între ultimul somn de zi și somnul de noapte
+    if (napInputs.length > 0 && napInputs[napInputs.length - 1].startTime && napInputs[napInputs.length - 1].duration && nightSleep.startTime) {
+      const lastDayNap = napInputs[napInputs.length - 1]
+      const [startHour, startMin] = lastDayNap.startTime.split(':').map(Number)
+      const durationMinutes = parseInt(lastDayNap.duration) || 0
+      const startTotalMinutes = startHour * 60 + startMin
+      const endTotalMinutes = startTotalMinutes + durationMinutes
+      
+      const [nightHour, nightMin] = nightSleep.startTime.split(':').map(Number)
+      const nightStartTotalMinutes = nightHour * 60 + nightMin
+      
+      let pvMinutes = nightStartTotalMinutes - endTotalMinutes
+      if (pvMinutes < 0) {
+        pvMinutes = (24 * 60) + pvMinutes
+      }
+      
+      const pvHours = pvMinutes / 60
+
+      if (pvHours >= 0 && pvHours <= 24) {
         const isOk = pvHours >= recommendedPV.min && pvHours <= recommendedPV.max
         const isTooShort = pvHours < recommendedPV.min
         const isTooLong = pvHours > recommendedPV.max
 
         calculatedPVs.push({
-          fromNap: i + 1,
-          toNap: i + 2,
+          fromNap: napInputs.length,
+          toNap: 'noapte',
+          fromType: 'zi',
+          toType: 'noapte',
           pvHours: pvHours.toFixed(1),
           recommended: recommendedPV,
           isOk,
           isTooShort,
-          isTooLong
+          isTooLong,
+          error: false
+        })
+      } else {
+        calculatedPVs.push({
+          fromNap: napInputs.length,
+          toNap: 'noapte',
+          fromType: 'zi',
+          toType: 'noapte',
+          pvHours: pvHours.toFixed(1),
+          recommended: recommendedPV,
+          isOk: false,
+          isTooShort: true,
+          isTooLong: false,
+          error: true
         })
       }
     }
 
     setWakeWindows(calculatedPVs)
-  }, [napInputs, answers.age])
+  }, [napInputs, nightSleep, answers.age])
 
   const handleNapInputChange = (index, field, value) => {
     const newInputs = [...napInputs]
@@ -246,6 +315,13 @@ const QuestionForm = () => {
       [field]: value
     }
     setNapInputs(newInputs)
+  }
+
+  const handleNightSleepChange = (field, value) => {
+    setNightSleep(prev => ({
+      ...prev,
+      [field]: value
+    }))
   }
 
   const handleAnswerChange = (value) => {
@@ -302,10 +378,18 @@ const QuestionForm = () => {
       }
       return
     } else if (currentQ.type === 'napInputs') {
-      // Validare pentru napInputs
-      const incomplete = napInputs.some((nap, idx) => !nap.startTime || !nap.duration)
-      if (incomplete) {
-        setError('Te rog completează ora de început și durata pentru toate somnurile')
+      // Validare pentru napInputs (somnuri de zi) - doar dacă există somnuri de zi
+      if (napInputs.length > 0) {
+        const incompleteDayNaps = napInputs.some((nap, idx) => !nap.startTime || !nap.duration)
+        if (incompleteDayNaps) {
+          setError('Te rog completează ora de început și durata pentru toate somnurile de zi')
+          return
+        }
+      }
+      
+      // Validare pentru somnul de noapte
+      if (!nightSleep.startTime || !nightSleep.duration) {
+        setError('Te rog completează ora de început și durata pentru somnul de noapte')
         return
       }
       
@@ -313,6 +397,7 @@ const QuestionForm = () => {
       const updatedAnswers = {
         ...answers,
         [currentQ.id]: napInputs,
+        nightSleep: nightSleep,
         wakeWindows: wakeWindows
       }
       setAnswers(updatedAnswers)
@@ -536,6 +621,7 @@ const QuestionForm = () => {
         age: ageNumber !== null ? ageNumber : answers.age,
         numberOfNaps: napsNumber !== null ? napsNumber : answers.numberOfNaps
       }
+      const nightSleepText = answers.nightSleep ? `Somnul de noapte: ${answers.nightSleep.startTime} (${answers.nightSleep.duration} ore)` : 'Nu a fost specificat'
       const sleepsWithText = answers.sleepsWith || 'Nu a fost specificat'
       const routineConsistentText = answers.routineConsistent || 'Nu a fost specificat'
       const wakesAtNightText = answers.wakesAtNight || 'Nu se trezește noaptea'
@@ -544,7 +630,7 @@ const QuestionForm = () => {
       const screenTimeText = answers.screenTime || 'Nu a fost specificat'
       const loudMusicText = answers.loudMusic || 'Nu a fost specificat'
       
-      const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${ageText} luni. Are ${napsText} somnuri de zi. Detalii somnuri de zi: ${napDetailsText}${wakeWindowsText}. Somnul de noapte începe la: ${bedtimeStartText}. Adoarme ${sleepsWithText}. Rutina de culcare: ${routineText}. Rutina este ${routineConsistentText}. Se trezește noaptea: ${wakesAtNightText}. Iese afară: ${goesOutsideText}. Mănâncă cu ${eatingBeforeSleepText} înainte de somn. Ecrane: ${screenTimeText}. Muzică: ${loudMusicText}. Ce recomandări ai pentru îmbunătățirea somnului? Analizează și interpretează PV-urile calculate și spune dacă sunt potrivite pentru vârsta copilului.`
+      const fullQuestion = `Problemele pe care părintele vrea să le rezolve: ${problemsText}. Copilul are ${ageText} luni. Are ${napsText} somnuri de zi. Detalii somnuri de zi: ${napDetailsText}${wakeWindowsText}. ${nightSleepText}. Adoarme ${sleepsWithText}. Rutina de culcare: ${routineText}. Rutina este ${routineConsistentText}. Se trezește noaptea: ${wakesAtNightText}. Iese afară: ${goesOutsideText}. Mănâncă cu ${eatingBeforeSleepText} înainte de somn. Ecrane: ${screenTimeText}. Muzică: ${loudMusicText}. Ce recomandări ai pentru îmbunătățirea somnului? Analizează și interpretează PV-urile calculate și spune dacă sunt potrivite pentru vârsta copilului.`
       
       const response = await askQuestion(fullQuestion, cleanedAnswers)
       setAnswer(response.answer)
@@ -776,9 +862,10 @@ const QuestionForm = () => {
             </select>
           ) : currentQuestion.type === 'napInputs' ? (
             <div className="space-y-4">
+              {/* Somnurile de zi */}
               {napInputs.map((nap, index) => (
                 <div key={index} className="p-4 border border-gray-300 rounded-lg bg-gray-50">
-                  <h4 className="font-semibold text-gray-700 mb-3">Somnul {index + 1}</h4>
+                  <h4 className="font-semibold text-gray-700 mb-3">Somnul de zi {index + 1}</h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -811,23 +898,69 @@ const QuestionForm = () => {
                 </div>
               ))}
               
-              {/* Afișează PV-urile calculate */}
-              {wakeWindows.length > 0 && (
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 mb-2">Perioade de Veghe (PV) calculate:</h4>
-                  {wakeWindows.map((pv, idx) => (
-                    <div key={idx} className={`mb-2 p-2 rounded ${pv.isOk ? 'bg-green-100' : pv.isTooShort ? 'bg-red-100' : 'bg-amber-100'}`}>
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">
-                          PV între somnul {pv.fromNap} și {pv.toNap}: <strong>{pv.pvHours} ore</strong>
+              {/* Somnul de noapte */}
+              <div className="p-4 border-2 border-indigo-300 rounded-lg bg-indigo-50">
+                <h4 className="font-semibold text-indigo-900 mb-3">Somnul de noapte</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-indigo-700 mb-1">
+                      Ora de început
+                    </label>
+                    <input
+                      type="time"
+                      value={nightSleep.startTime}
+                      onChange={(e) => handleNightSleepChange('startTime', e.target.value)}
+                      className="input-field"
+                      disabled={loading}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-indigo-700 mb-1">
+                      Durata (ore)
+                    </label>
+                    <input
+                      type="number"
+                      value={nightSleep.duration}
+                      onChange={(e) => handleNightSleepChange('duration', e.target.value)}
+                      placeholder="ex: 11"
+                      min="8"
+                      max="14"
+                      step="0.5"
+                      className="input-field"
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Afișează doar PV-urile problematice */}
+              {wakeWindows.filter(pv => !pv.isOk || pv.error || parseFloat(pv.pvHours) < 0).length > 0 && (
+                <div className="mt-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+                  <h4 className="font-bold text-red-900 mb-3 flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    PV-uri problematice (necesită atenție):
+                  </h4>
+                  {wakeWindows.filter(pv => !pv.isOk || pv.error || parseFloat(pv.pvHours) < 0).map((pv, idx) => (
+                    <div key={idx} className={`mb-3 p-3 rounded-lg ${pv.error || parseFloat(pv.pvHours) < 0 ? 'bg-red-200 border-2 border-red-400' : pv.isTooShort ? 'bg-red-100 border border-red-300' : 'bg-amber-100 border border-amber-300'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-base">
+                          PV între {pv.fromType === 'zi' ? `somnul de zi ${pv.fromNap}` : 'somnul de noapte'} și {pv.toType === 'noapte' ? 'somnul de noapte' : `somnul de zi ${pv.toNap}`}: <strong className="text-red-800">{pv.pvHours} ore</strong>
                         </span>
-                        <span className={`text-sm font-semibold ${pv.isOk ? 'text-green-700' : pv.isTooShort ? 'text-red-700' : 'text-amber-700'}`}>
-                          {pv.isOk ? '✓ OK' : pv.isTooShort ? '⚠ Prea scurt' : '⚠ Prea lung'}
+                        <span className={`text-sm font-bold px-2 py-1 rounded ${pv.error || parseFloat(pv.pvHours) < 0 ? 'bg-red-300 text-red-900' : pv.isTooShort ? 'bg-red-200 text-red-800' : 'bg-amber-200 text-amber-800'}`}>
+                          {pv.error || parseFloat(pv.pvHours) < 0 ? '⚠ Date incorecte' : pv.isTooShort ? '⚠ Prea scurt' : '⚠ Prea lung'}
                         </span>
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">
-                        Recomandat pentru vârsta copilului: {pv.recommended.min}-{pv.recommended.max} ore (optim: {pv.recommended.optimal} ore)
-                      </div>
+                      {pv.error || parseFloat(pv.pvHours) < 0 ? (
+                        <div className="text-sm text-red-800 font-semibold">
+                          ⚠ Verifică orele introduse - ora de sfârșit a somnului anterior este după ora de început a somnului următor
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-700">
+                          Recomandat pentru vârsta copilului: <strong>{pv.recommended.min}-{pv.recommended.max} ore</strong> (optim: {pv.recommended.optimal} ore)
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
