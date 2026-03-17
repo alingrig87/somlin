@@ -24,9 +24,18 @@ load_dotenv()
 app = FastAPI(title="Somlin API", version="1.0.0")
 
 # CORS middleware
+# Permite toate originile în development pentru Expo și alte aplicații mobile
+cors_origins = ["http://localhost:3000", "http://localhost:5173", "http://localhost:19000", "http://localhost:8081"]
+# Adaugă și IP-ul local pentru conexiuni mobile (poate fi configurat prin variabilă de mediu)
+if os.getenv("ALLOWED_ORIGINS"):
+    cors_origins.extend(os.getenv("ALLOWED_ORIGINS").split(","))
+# În development, permite toate originile pentru a funcționa cu Expo
+if os.getenv("ENV") != "production":
+    cors_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -41,6 +50,11 @@ else:
 # Initialize Gemini API key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+
+# Initialize Claude API key
+CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
+CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
+CLAUDE_MODEL = "claude-sonnet-4-6"
 
 # Request/Response models
 class NapTime(BaseModel):
@@ -156,9 +170,41 @@ Structura răspunsului:
     
     return prompt
 
+
+def call_claude_api(prompt: str, max_tokens: int = 2048, temperature: float = 0.2) -> str:
+    """Apelează API-ul Claude (Messages API) pentru un răspuns generativ"""
+    if not CLAUDE_API_KEY:
+        raise ValueError("CLAUDE_API_KEY nu este setat în variabila de mediu")
+
+    payload = {
+        "model": CLAUDE_MODEL,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
+    }
+
+    headers = {
+        "x-api-key": CLAUDE_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+    }
+
+    response = requests.post(CLAUDE_API_URL, json=payload, headers=headers, timeout=60)
+    response.raise_for_status()
+    data = response.json()
+
+    # Messages API returnează content ca listă de blocks
+    content = data.get("content", [])
+    if content and content[0].get("type") == "text":
+        return content[0]["text"]
+    return ""
+
+
 @app.post("/api/analyze-sleep", response_model=AIResponse)
-async def analyze_sleep(data: SleepDataRequest):
-    """Analizează datele de somn folosind sistemul bazat pe reguli (rule-based)"""
+async def analyze_sleep(data: SleepDataRequest, use_claude: bool = False):
+    """Analizează datele de somn folosind sistemul bazat pe reguli (rule-based) și, opțional, Claude"""
     
     try:
         # Calculează câmpurile lipsă
@@ -170,7 +216,18 @@ async def analyze_sleep(data: SleepDataRequest):
         
         # Folosește sistemul bazat pe reguli (rule-based)
         result = analyze_sleep_data(data_dict)
-        
+
+        if use_claude:
+            # Pregătește prompt pentru Claude
+            prompt = generate_sleep_analysis_prompt(data)
+            claude_output = call_claude_api(prompt)
+            return AIResponse(
+                analysis=claude_output or result['analysis'],
+                recommendations=result.get('recommendations', []),
+                concerns=result.get('concerns'),
+                positive_notes=result.get('positive_notes')
+            )
+
         return AIResponse(
             analysis=result['analysis'],
             recommendations=result['recommendations'],
@@ -191,9 +248,9 @@ async def root():
 @app.get("/health")
 async def health():
     return {
-        "status": "healthy", 
-        "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
-        "gemini_configured": bool(os.getenv("GEMINI_API_KEY")),
+        "status": "healthy",
+        "claude_configured": bool(CLAUDE_API_KEY),
+        "claude_model": CLAUDE_MODEL,
         "rule_based_system": "active"
     }
 
@@ -402,69 +459,29 @@ Răspunsul tău:"""
 
 @app.post("/api/ask-question", response_model=QuestionResponse)
 async def ask_question(request: QuestionRequest):
-    """Răspunde la întrebări despre somnul copiilor folosind Gemini AI"""
-    
-    if not GEMINI_AVAILABLE or not GEMINI_API_KEY:
+    """Răspunde la întrebări despre somnul copiilor folosind Claude AI"""
+
+    if not CLAUDE_API_KEY:
         raise HTTPException(
             status_code=503,
-            detail="Serviciul Gemini nu este disponibil. Verifică configurarea."
+            detail="Serviciul Claude nu este disponibil. Verifică CLAUDE_API_KEY."
         )
-    
+
     if not request.question or not request.question.strip():
         raise HTTPException(
             status_code=400,
             detail="Întrebarea nu poate fi goală"
         )
-    
+
     try:
-        # Construiește prompt-ul cu contextul complet
         prompt = build_gemini_prompt(request.question.strip(), request.answers or {})
-        
-        # Generează răspunsul folosind Gemini API REST
-        headers = {
-            "Content-Type": "application/json",
-            "X-goog-api-key": GEMINI_API_KEY
-        }
-        
-        payload = {
-            "contents": [{
-                "parts": [{
-                    "text": prompt
-                }]
-            }]
-        }
-        
-        response = requests.post(
-            GEMINI_API_URL,
-            headers=headers,
-            json=payload,
-            timeout=30
-        )
-        
-        if response.status_code != 200:
-            raise HTTPException(
-                status_code=response.status_code,
-                detail=f"Eroare API Gemini: {response.text}"
-            )
-        
-        result = response.json()
-        
-        # Extrage textul răspunsului
-        if 'candidates' in result and len(result['candidates']) > 0:
-            candidate = result['candidates'][0]
-            if 'content' in candidate and 'parts' in candidate['content']:
-                parts = candidate['content']['parts']
-                if len(parts) > 0 and 'text' in parts[0]:
-                    answer = parts[0]['text']
-                else:
-                    raise HTTPException(status_code=500, detail="Format răspuns neașteptat de la Gemini")
-            else:
-                raise HTTPException(status_code=500, detail="Format răspuns neașteptat de la Gemini")
-        else:
-            raise HTTPException(status_code=500, detail="Nu s-a primit răspuns de la Gemini")
-        
+        answer = call_claude_api(prompt)
+
+        if not answer:
+            raise HTTPException(status_code=500, detail="Nu s-a primit răspuns de la Claude")
+
         return QuestionResponse(answer=answer)
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -475,4 +492,4 @@ async def ask_question(request: QuestionRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8002, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8002, reload=True)
