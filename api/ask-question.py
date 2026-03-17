@@ -272,7 +272,10 @@ class handler(BaseHTTPRequestHandler):
             
             question = data.get('question', '')
             answers = data.get('answers', {})
-            
+
+            print(f"[Claude] Întrebare: {question[:100]}...")
+            print(f"[Claude] Vârstă copil: {answers.get('age', 'necunoscută')} luni")
+
             if not question:
                 self.send_response(400)
                 self.send_header('Content-Type', 'application/json')
@@ -329,6 +332,8 @@ class handler(BaseHTTPRequestHandler):
             content = result.get("content", [])
             if content and content[0].get("type") == "text":
                 answer = content[0]["text"]
+                usage = result.get("usage", {})
+                print(f"[Claude] Tokens folosiți: input={usage.get('input_tokens', '?')}, output={usage.get('output_tokens', '?')}")
             else:
                 raise Exception("Format răspuns neașteptat de la Claude")
             
