@@ -5,9 +5,10 @@ import requests
 import random
 from urllib.parse import parse_qs, urlparse
 
-# Gemini API configuration
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+# Claude API configuration
+CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
+CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
+CLAUDE_MODEL = "claude-sonnet-4-6"
 
 # Încarcă datele statice
 def load_static_data():
@@ -280,61 +281,56 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({'error': 'Întrebarea nu poate fi goală'}).encode())
                 return
             
-            if not GEMINI_API_KEY:
+            if not CLAUDE_API_KEY:
                 self.send_response(503)
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                self.wfile.write(json.dumps({'error': 'GEMINI_API_KEY nu este configurată'}).encode())
+                self.wfile.write(json.dumps({'error': 'CLAUDE_API_KEY nu este configurată'}).encode())
                 return
-            
+
             # Construiește prompt-ul
             prompt = build_gemini_prompt(question, answers)
-            
-            # Generează răspunsul folosind Gemini API
+
+            # Generează răspunsul folosind Claude Messages API
             headers = {
+                "x-api-key": CLAUDE_API_KEY,
+                "anthropic-version": "2023-06-01",
                 "Content-Type": "application/json",
-                "X-goog-api-key": GEMINI_API_KEY
             }
-            
+
             payload = {
-                "contents": [{
-                    "parts": [{
-                        "text": prompt
-                    }]
-                }]
+                "model": CLAUDE_MODEL,
+                "max_tokens": 2048,
+                "temperature": 0.2,
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ],
             }
-            
+
             response = requests.post(
-                GEMINI_API_URL,
+                CLAUDE_API_URL,
                 headers=headers,
                 json=payload,
-                timeout=30
+                timeout=60
             )
-            
+
             if response.status_code != 200:
                 self.send_response(response.status_code)
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                self.wfile.write(json.dumps({'error': f'Eroare API Gemini: {response.text}'}).encode())
+                self.wfile.write(json.dumps({'error': f'Eroare API Claude: {response.text}'}).encode())
                 return
-            
+
             result = response.json()
-            
+
             # Extrage textul răspunsului
-            if 'candidates' in result and len(result['candidates']) > 0:
-                candidate = result['candidates'][0]
-                if 'content' in candidate and 'parts' in candidate['content']:
-                    parts = candidate['content']['parts']
-                    if len(parts) > 0 and 'text' in parts[0]:
-                        answer = parts[0]['text']
-                    else:
-                        raise Exception("Format răspuns neașteptat de la Gemini")
-                else:
-                    raise Exception("Format răspuns neașteptat de la Gemini")
+            content = result.get("content", [])
+            if content and content[0].get("type") == "text":
+                answer = content[0]["text"]
             else:
-                raise Exception("Nu s-a primit răspuns de la Gemini")
+                raise Exception("Format răspuns neașteptat de la Claude")
             
             # Detectează probleme și generează priorități
             issues = detect_issues(answers)
