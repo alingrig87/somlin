@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
+import { downloadHTMLReport } from '../utils/generateHTML'
 
-const AnswerDisplay = ({ answer, priorities = [] }) => {
+const AnswerDisplay = ({ answer, priorities = [], answers = {} }) => {
   const formattedAnswer = useMemo(() => {
     if (!answer) return null
 
@@ -214,6 +215,19 @@ const AnswerDisplay = ({ answer, priorities = [] }) => {
 
   return (
     <div className="space-y-8">
+      {/* Buton download raport HTML */}
+      <div className="flex justify-end">
+        <button
+          onClick={() => downloadHTMLReport(answer, priorities, answers)}
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Descarcă Raport HTML
+        </button>
+      </div>
+
       {formattedAnswer.map((section, index) => {
         // Text simplu fără structură
         if (section.type === 'text' && !section.title) {

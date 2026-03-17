@@ -755,7 +755,7 @@ const QuestionForm = () => {
               Analiză și Recomandări
             </h3>
           </div>
-          <AnswerDisplay answer={answer} priorities={priorities} />
+          <AnswerDisplay answer={answer} priorities={priorities} answers={answers} />
         </div>
 
         {/* Butoane pentru PDF */}
